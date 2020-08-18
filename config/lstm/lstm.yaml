@@ -17,6 +17,6 @@ train:
   dropout: 0
   epochs: 300
   optimizer: adadelta
-  patience: 1
+  patience: 15
   loss: mse
 
