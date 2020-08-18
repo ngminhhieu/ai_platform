@@ -7,16 +7,16 @@ data:
   valid_size: 0.2
 log_level: INFO
 model:
-  rnn_units: 100
   activation: relu
+  horizon: 1
   input_dim: 72
   output_dim: 72
+  rnn_units: 100
   seq_len: 7
-  horizon: 1
 train:
   dropout: 0
   epochs: 300
+  log_dir: log/lstm/default/
+  loss: mse
   optimizer: adadelta
   patience: 1
-  loss: mse
-

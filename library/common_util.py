@@ -127,6 +127,10 @@ def _save_model_history(model_history, config_model):
     if training_time_callback.logs is not None:
         dump_model_history['training_time'] = training_time_callback.logs
 
+    # total training time
+    dump_model_history.loc[-1, -1] = np.sum(training_time_callback.logs)
+
+    # save training log to csv
     dump_model_history.to_csv(config_model['log_dir'] + 'training_history.csv',
                               index=False)
 
