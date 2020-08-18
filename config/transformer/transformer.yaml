@@ -1,0 +1,20 @@
+base_dir: log/transformer/
+data:
+  batch_size: 200
+  dataset: ../drive/My Drive/map_gauge_72_stations.npz
+  test_batch_size: 1
+  test_size: 0.2
+  valid_size: 0.2
+log_level: INFO
+model:
+  rnn_units: 100
+  activation: relu
+  seq_len: 4
+  horizon: 0
+train:
+  dropout: 0
+  epochs: 300
+  optimizer: adam
+  patience: 15
+  loss: mse
+

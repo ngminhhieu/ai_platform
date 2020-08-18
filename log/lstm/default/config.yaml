@@ -1,0 +1,22 @@
+base_dir: log/lstm/
+data:
+  batch_size: 200
+  dataset: data/lstm/actual.csv
+  test_batch_size: 1
+  test_size: 0.2
+  valid_size: 0.2
+log_level: INFO
+model:
+  activation: relu
+  horizon: 1
+  input_dim: 72
+  output_dim: 72
+  rnn_units: 100
+  seq_len: 7
+train:
+  dropout: 0
+  epochs: 300
+  log_dir: log/lstm/default/
+  loss: mse
+  optimizer: adadelta
+  patience: 15
