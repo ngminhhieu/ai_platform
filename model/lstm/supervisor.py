@@ -1,7 +1,7 @@
 from keras.layers import Dense, LSTM, Input
 from keras.models import Sequential
 import numpy as np
-from lib import common_util
+from library import common_util
 import model.lstm.utils as utils
 import os
 import yaml

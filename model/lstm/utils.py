@@ -2,7 +2,7 @@ import os
 import numpy as np
 from pandas import read_csv
 from sklearn.preprocessing import MinMaxScaler
-from lib import common_util
+from library import common_util
 
 
 def create_data(dataset, **kwargs):
