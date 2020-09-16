@@ -68,10 +68,11 @@ def get_config_model(**kwargs):
     callbacks = []
 
     checkpoints_callback = ModelCheckpoint(config_model['log_dir'] +
-                                           "best_model.hdf5",
+                                           "best_model.tf",
                                            monitor='val_loss',
                                            verbose=1,
                                            save_best_only=True,
+                                           save_weights_only=True,
                                            mode='auto',
                                            period=1)
     earlystopping_callback = EarlyStopping(monitor='val_loss',

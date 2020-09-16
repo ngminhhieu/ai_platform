@@ -6,10 +6,10 @@ from library import common_util
 
 
 def create_data(dataset, **kwargs):
-    seq_len = kwargs['model'].get('seq_len')
-    horizon = kwargs['model'].get('horizon')
-    input_dim = kwargs['model'].get('input_dim')
-    output_dim = kwargs['model'].get('output_dim')
+    seq_len = kwargs['model'].get('seq_len') #7
+    horizon = kwargs['model'].get('horizon') #1
+    input_dim = kwargs['model'].get('input_dim') #10
+    output_dim = kwargs['model'].get('output_dim') #1
     T = dataset.shape[0]
     # only take pm10 and pm2.5 to predict
     _input = dataset[:, -input_dim:].copy()

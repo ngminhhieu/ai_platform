@@ -1,17 +1,20 @@
-from keras.layers import Dense, LSTM, Input
+from keras.layers import Dense, LSTM, Input, GRU, SimpleRNN
 from keras.models import Sequential
 import numpy as np
+import tensorflow as tf
+
+import sys
 from library import common_util
-import model.lstm.utils as utils
+import model.RNN.utils as utils
 import os
 import yaml
 from pandas import read_csv
 from keras.utils import plot_model
 from keras import backend as K
 from keras.losses import mse
+from model.layers import *
 
-
-class LSTMSupervisor():
+class Nets():
     def __init__(self, **kwargs):
         self.config_model = common_util.get_config_model(**kwargs)
 
@@ -37,18 +40,32 @@ class LSTMSupervisor():
         self.input_dim = self.config_model['input_dim']
         self.output_dim = self.config_model['output_dim']
         self.rnn_units = self.config_model['rnn_units']
+        self.type = self.config_model['type']
+        self.rnn_layers = self.config_model['rnn_layers']
         self.model = self.construct_model()
 
     def construct_model(self):
-        model = Sequential()
-        model.add(LSTM(self.rnn_units, activation=self.activation, return_sequences=True, input_shape=(self.seq_len, self.input_dim)))
-        model.add(LSTM(self.rnn_units, activation=self.activation))
-        model.add(Dense(self.output_dim))
-        print(model.summary())
+        if self.type == 'rnn':
+            cell = RNNs(units = self.rnn_units, num_cells= self.rnn_layers, go_backwards=False, dropout=0.,
+                 return_sequences=False, return_state=False, name='rnns', l2=0., activation = self.activation)
+        elif self.type == 'lstm':
+            cell = LSTMs(units=self.rnn_units, num_cells=self.rnn_layers, go_backwards=False, dropout=0.,
+                        return_sequences=False, return_state=False, name='lstms', l2=0., activation = self.activation)
+        else:
+            cell = GRUs(units=self.rnn_units, num_cells=self.rnn_layers, go_backwards=False, dropout=0.,
+                        return_sequences=False, return_state=False, name='grus', l2=0., activation = self.activation)
+
+        inputs = Input(shape=(self.seq_len, self.input_dim))
+        x = cell(inputs)
+        x = Dense(self.output_dim)(x)
+        model = tf.keras.Model(inputs = inputs,
+                               outputs = x,
+                               name = self.type+'s_net')
+        model.summary()
         # plot model
         from keras.utils import plot_model
         plot_model(model=model,
-                   to_file=self.log_dir + '/lstm_model.png',
+                   to_file=self.log_dir + '/'+self.type+'_model.png',
                    show_shapes=True)
         return model
 
@@ -82,7 +99,7 @@ class LSTMSupervisor():
 
     def test(self):
         print("Load model from: {}".format(self.log_dir))
-        self.model.load_weights(self.log_dir + 'best_model.hdf5')
+        self.model.load_weights(self.log_dir + 'best_model.tf')
         self.model.compile(optimizer=self.optimizer, loss=self.loss)
         input_test = self.input_test
         target_test = self.target_test
@@ -96,32 +113,21 @@ class LSTMSupervisor():
 
         groundtruth = np.array(groundtruth)
         preds = np.array(preds)
-        
-        # finding the best
-        min_mae = 99999
-        best_preds = np.zeros(shape=(preds.shape[0], 1))
+
         for i in range(groundtruth.shape[1]):
             gt = groundtruth[:, i].copy()
             pd = preds[:, i].copy()
-            mae = common_util.mae(gt, pd)
-            if mae < min_mae:
-                min_mae = mae
-                best_preds = pd.copy()
-                only_gt = gt.copy()
-        
-        common_util.save_metrics(np.array(common_util.cal_error(only_gt.flatten(), best_preds.flatten())), self.log_dir, "list_metrics")
-        np.savetxt(self.log_dir + 'groundtruth.csv', only_gt, delimiter=",")
-        np.savetxt(self.log_dir + 'preds.csv', best_preds, delimiter=",")
+            error_mae, error_rmse, error_mape = common_util.cal_error(gt.reshape(-1), pd.reshape(-1))
+            with open(os.path.join(self.log_dir+"test_metric.txt"), 'a') as f:
+                f.write('List errors of feature {:d}: MAE = {:.4f} ---- RMSE = {:.4f} ---- MAPE = {:.4f}'.format(i, error_mae, error_rmse, error_mape))
+            print('List errors of feature {:d}: MAE = {:.4f} ---- RMSE = {:.4f} ---- MAPE = {:.4f}'.format(i, error_mae, error_rmse, error_mape))
 
-    def plot_result(self):
-        from matplotlib import pyplot as plt
-        preds = read_csv(self.log_dir + 'preds.csv')
-        gt = read_csv(self.log_dir + 'groundtruth.csv')
-        preds = preds.to_numpy()
-        gt = gt.to_numpy()
-        for i in range(preds.shape[1]):
-            plt.plot(preds[:, i], label='preds')
-            plt.plot(gt[:, i], label='gt')
-            plt.legend()
-            plt.savefig(self.log_dir + 'result_predict_{}.png'.format(i))
-            plt.close()
+#dataset = read_csv('/home/ad/PycharmProjects/build_models/ML_platform/data/hanoi_data_median.csv').to_numpy()
+
+#with open('/home/ad/PycharmProjects/build_models/ML_platform/config/RNN/rnn.yaml','r') as f:
+#    config = yaml.load(f)
+#data = utils.load_dataset(**config)
+#net = Nets(**config)
+#net.train()
+#net.train()
+

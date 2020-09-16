@@ -5,7 +5,7 @@ import tensorflow as tf
 import numpy as np
 import yaml
 import random as rn
-from model.lstm.supervisor import LSTMSupervisor
+from model.RNN.supervisor import Nets
 
 
 def seed():
@@ -27,13 +27,13 @@ if __name__ == '__main__':
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_file',
-                        default='config/lstm/lstm.yaml',
+                        default='config/RNN/rnn.yaml',
                         type=str,
                         help='Config file for pretrained model.')
     parser.add_argument('--mode',
                         default='train',
                         type=str,
-                        help='Run mode.')
+                        help='Run mode: train / test')
     args = parser.parse_args()
 
     # load config for seq2seq model
@@ -42,12 +42,11 @@ if __name__ == '__main__':
             config = yaml.load(f)
 
     if args.mode == 'train':
-        model = LSTMSupervisor(**config)
+        model = Nets(**config)
         model.train()
     elif args.mode == 'test':
         # predict
-        model = LSTMSupervisor(**config)
+        model = Nets(**config)
         model.test()
-        model.plot_result()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")

@@ -1,0 +1,23 @@
+base_dir: log/rnn/
+data:
+  batch_size: 128
+  dataset: ./data/hanoi_data_median.csv
+  test_batch_size: 1
+  test_size: 0.2
+  valid_size: 0.2
+log_level: INFO
+model:
+  type: gru # it can be: 1.gru   2.lstm   3.rnn
+  rnn_units: 100 # = output_dim as default
+  rnn_layers: 2 # more to stacks layers
+  activation: relu
+  input_dim: 10
+  output_dim: 1
+  seq_len: 7
+  horizon: 1
+train:
+  dropout: 0
+  epochs: 300
+  optimizer: adadelta
+  patience: 15
+  loss: mse

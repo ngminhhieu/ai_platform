@@ -1,7 +1,7 @@
-base_dir: log/lstm/
+base_dir: log/rnn/
 data:
-  batch_size: 200
-  dataset: data/lstm/actual.csv
+  batch_size: 128
+  dataset: ./data/hanoi_data_median.csv
   test_batch_size: 1
   test_size: 0.2
   valid_size: 0.2
@@ -9,14 +9,16 @@ log_level: INFO
 model:
   activation: relu
   horizon: 1
-  input_dim: 72
-  output_dim: 72
+  input_dim: 10
+  output_dim: 10
+  rnn_layers: 2
   rnn_units: 100
   seq_len: 7
+  type: gru
 train:
   dropout: 0
   epochs: 300
-  log_dir: log/lstm/default/
+  log_dir: log/rnn/default/
   loss: mse
   optimizer: adadelta
-  patience: 1
+  patience: 15
