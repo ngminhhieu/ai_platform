@@ -1,11 +1,16 @@
 import argparse
 import os
 import sys
-import tensorflow as tf
 import numpy as np
 import yaml
 import random as rn
 from model.lstm.supervisor import LSTMSupervisor
+import tensorflow as tf
+
+# allow run multiple command python (sharing GPU)
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+session = tf.Session(config=config)
 
 
 def seed():
@@ -48,6 +53,6 @@ if __name__ == '__main__':
         # predict
         model = LSTMSupervisor(**config)
         model.test()
-        model.plot_result()
+        # model.plot_result()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")
