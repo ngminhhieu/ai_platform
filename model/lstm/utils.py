@@ -46,6 +46,6 @@ def load_dataset(**kwargs):
         data["input_" + cat] = x
         data["target_" + cat] = y
         print("input_" + cat, x.shape)
-        print("target_" +cat, y.shape)
+        print("target_" + cat, y.shape)
     # data['scaler'] = scaler
     return data

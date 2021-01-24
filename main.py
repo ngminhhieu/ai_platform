@@ -4,14 +4,13 @@ import sys
 import numpy as np
 import yaml
 import random as rn
-from model.lstm.supervisor import LSTMSupervisor
+from model.cnn_lstm_attention.supervisor import Conv1DLSTMAttentionSupervisor
 import tensorflow as tf
 
 # allow run multiple command python (sharing GPU)
-config = tf.ConfigProto()
+config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
-session = tf.Session(config=config)
-
+session = tf.compat.v1.Session(config=config)
 
 def seed():
     # The below is necessary for starting Numpy generated random numbers
@@ -32,7 +31,7 @@ if __name__ == '__main__':
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_file',
-                        default='config/lstm/lstm.yaml',
+                        default='config/cnn_lstm_attention/cnn_lstm_attention.yaml',
                         type=str,
                         help='Config file for pretrained model.')
     parser.add_argument('--mode',
@@ -47,12 +46,12 @@ if __name__ == '__main__':
             config = yaml.load(f)
 
     if args.mode == 'train':
-        model = LSTMSupervisor(**config)
+        model = Conv1DLSTMAttentionSupervisor(**config)
         model.train()
     elif args.mode == 'test':
         # predict
-        model = LSTMSupervisor(**config)
+        model = Conv1DLSTMAttentionSupervisor(**config)
         model.test()
-        # model.plot_result()
+        model.plot_result()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")
