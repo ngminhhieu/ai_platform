@@ -69,7 +69,7 @@ class Conv1DLSTMAttentionSupervisor():
                                           validation_data=(self.input_valid,
                                                            self.target_valid),
                                           shuffle=True,
-                                          verbose=1)
+                                          verbose=2)
 
         if training_history is not None:
             common_util._plot_training_history(training_history,
@@ -85,18 +85,18 @@ class Conv1DLSTMAttentionSupervisor():
                 yaml.dump(config, f, default_flow_style=False)
 
     def test(self):
-        scaler = self._data['scaler']
-        data_test = self._data['test_data_norm'].copy()
+        scaler = self.data['scaler']
+        data_test = self.data['test_data_norm'].copy()
         # this is the meterogical data
-        other_features_data = data_test[:, 0:(self._input_dim -
-                                              self._output_dim)].copy()
-        pm_data = data_test[:, -self._output_dim:].copy()
+        other_features_data = data_test[:, 0:(self.input_dim -
+                                              self.output_dim)].copy()
+        pm_data = data_test[:, -self.output_dim:].copy()
         T = len(data_test)
-        l = self._seq_len
-        h = self._horizon
-        # pd = np.zeros(shape=(T, self._output_dim), dtype='float32')
+        l = self.seq_len
+        h = self.horizon
+        # pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
         # pd[:l] = pm_data[:l]
-        _pd = np.zeros(shape=(T, self._output_dim), dtype='float32')
+        _pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
         _pd[:l] = pm_data[:l]
         iterator = tqdm(range(0, T - l - h, h))
         for i in iterator:
@@ -106,7 +106,7 @@ class Conv1DLSTMAttentionSupervisor():
                 _pd = _pd[~np.all(_pd == 0, axis=1)]
                 iterator.close()
                 break
-            input = np.zeros(shape=(self._test_batch_size, l, self._input_dim))
+            input = np.zeros(shape=(1, l, self.input_dim))
             input[0, :, :] = data_test[i:i + l].copy()
             yhats = self.model.predict(input)
             _pd[i + l:i + l + h] = yhats
@@ -122,34 +122,34 @@ class Conv1DLSTMAttentionSupervisor():
                                             axis=0)
         inverse_pred_data = scaler.inverse_transform(
             np.concatenate((other_features_data, _pd), axis=1))
-        predicted_data = inverse_pred_data[:, -self._output_dim:]
+        predicted_data = inverse_pred_data[:, -self.output_dim:]
         inverse_actual_data = scaler.inverse_transform(
             data_test[:predicted_data.shape[0]])
-        ground_truth = inverse_actual_data[:, -self._output_dim:]
-        np.save(self._log_dir + 'pd', predicted_data)
-        np.save(self._log_dir + 'gt', ground_truth)
+        ground_truth = inverse_actual_data[:, -self.output_dim:]
+        np.save(self.log_dir + 'pd', predicted_data)
+        np.save(self.log_dir + 'gt', ground_truth)
         # save metrics to log dir
         error_list = utils_model.cal_error(ground_truth.flatten(),
                                            predicted_data.flatten())
         mae = utils_model.mae(ground_truth.flatten(), predicted_data.flatten())
-        utils_model.save_metrics(error_list, self._log_dir, self._alg_name)
+        utils_model.save_metrics(error_list, self.log_dir, "cnn_lstm_attention")
         return mae
 
     def plot_result(self):
-        preds = np.load(self._log_dir + 'pd.npy')
-        gt = np.load(self._log_dir + 'gt.npy')
+        preds = np.load(self.log_dir + 'pd.npy')
+        gt = np.load(self.log_dir + 'gt.npy')
         if preds.shape[1] == 1 and gt.shape[1] == 1:
-            pd.DataFrame(preds).to_csv(self._log_dir + "prediction_values.csv",
+            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values.csv",
                                        header=['PM2.5'],
                                        index=False)
-            pd.DataFrame(gt).to_csv(self._log_dir + "grouthtruth_values.csv",
+            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv",
                                     header=['PM2.5'],
                                     index=False)
         else:
-            pd.DataFrame(preds).to_csv(self._log_dir + "prediction_values.csv",
+            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values.csv",
                                        header=['PM10', 'PM2.5'],
                                        index=False)
-            pd.DataFrame(gt).to_csv(self._log_dir + "grouthtruth_values.csv",
+            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv",
                                     header=['PM10', 'PM2.5'],
                                     index=False)
 
@@ -157,6 +157,6 @@ class Conv1DLSTMAttentionSupervisor():
             plt.plot(preds[:, i], label='preds')
             plt.plot(gt[:, i], label='gt')
             plt.legend()
-            plt.savefig(self._log_dir +
+            plt.savefig(self.log_dir +
                         '[result_predict]output_dim_{}.png'.format(str(i + 1)))
             plt.close()
