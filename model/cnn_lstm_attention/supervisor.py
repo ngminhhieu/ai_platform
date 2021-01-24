@@ -6,7 +6,7 @@ from library import common_util
 import model.cnn_lstm_attention.utils as utils
 import os
 import yaml
-from pandas import read_csv
+from tqdm import tqdm
 from keras.utils import plot_model
 from keras import backend as K
 from keras.losses import mse
