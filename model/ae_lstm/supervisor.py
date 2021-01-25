@@ -1,9 +1,8 @@
-from keras.layers import Dense, LSTM, Input, Conv1D
+from keras.layers import Dense, LSTM, Input, Bidirectional
 from keras.models import Sequential
-from model.cnn_lstm_attention.attention import Attention
 import numpy as np
 from library import common_util
-import model.cnn_lstm_attention.utils as utils
+import model.ae_lstm.utils as utils
 import os
 import yaml
 from tqdm import tqdm
@@ -14,7 +13,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-class Conv1DLSTMAttentionSupervisor():
+class AELSTMSupervisor():
     def __init__(self, **kwargs):
         self.config_model = common_util.get_config_model(**kwargs)
 
@@ -40,21 +39,18 @@ class Conv1DLSTMAttentionSupervisor():
         self.input_dim = self.config_model['input_dim']
         self.output_dim = self.config_model['output_dim']
         self.rnn_units = self.config_model['rnn_units']
+        self.dropout = self.config_model['dropout']
         self.model = self.construct_model()
 
     def construct_model(self):
-        model = Sequential([
-            Conv1D(filters=64,
-                   kernel_size=3,
-                   activation=self.activation,
-                   input_shape=(self.seq_len, self.input_dim)),
-            LSTM(self.rnn_units, return_sequences=True),
-            Attention(name='attention_weight'),
-            Dense(1, activation=self.activation)
-        ])
+        model = Sequential()
+        model.add(Dense(10, input_shape=(self.seq_len, self.input_dim), activation=self.activation))
+
+        # model.add(Bidirectional(LSTM(self.rnn_units, activation=self.activation, dropout=self.dropout)))
+        model.Dense(1, activation=self.activation)
         from keras.utils import plot_model
         plot_model(model=model,
-                   to_file=self.log_dir + '/cnn_lstm_attention_model.png',
+                   to_file=self.log_dir + '/ae_lstm_model.png',
                    show_shapes=True)
         return model
 
@@ -87,55 +83,53 @@ class Conv1DLSTMAttentionSupervisor():
                 yaml.dump(config, f, default_flow_style=False)
 
     def test(self):
-        scaler = self.data['scaler']
-        data_test = self.data['test_data_norm'].copy()
-        # this is the meterogical data
-        other_features_data = data_test[:, 0:(self.input_dim -
-                                              self.output_dim)].copy()
-        pm_data = data_test[:, -self.output_dim:].copy()
-        T = len(data_test)
-        l = self.seq_len
-        h = self.horizon
-        # pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
-        # pd[:l] = pm_data[:l]
-        _pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
-        _pd[:l] = pm_data[:l]
-        iterator = tqdm(range(0, T - l - h, h))
-        for i in iterator:
-            if i + l + h > T - h:
-                # trimm all zero lines
-                # pd = pd[~np.all(pd==0, axis=1)]
-                _pd = _pd[~np.all(_pd == 0, axis=1)]
-                iterator.close()
-                break
-            input = np.zeros(shape=(1, l, self.input_dim))
-            input[0, :, :] = data_test[i:i + l].copy()
-            yhats = self.model.predict(input)
-            _pd[i + l:i + l + h] = yhats
+        outputs = [K.function([model.input], [layer.output])([self.input_train, 1]) for layer in model.layers]
+        print(outputs)
+        print(outputs.shape)
+        # # scaler = self.data['scaler']
+        # # data_test = self.data['test_data_norm'].copy()
+        # # # this is the meterogical data
+        # # other_features_data = data_test[:, 0:(self.input_dim -
+        # #                                       self.output_dim)].copy()
+        # # pm_data = data_test[:, -self.output_dim:].copy()
+        # # T = len(data_test)
+        # # l = self.seq_len
+        # # h = self.horizon
+        # # _pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
+        # # _pd[:l] = pm_data[:l]
+        # # iterator = tqdm(range(0, T - l - h, h))
+        # # for i in iterator:
+        # #     if i + l + h > T - h:
+        # #         # trimm all zero lines
+        # #         # pd = pd[~np.all(pd==0, axis=1)]
+        # #         _pd = _pd[~np.all(_pd == 0, axis=1)]
+        # #         iterator.close()
+        # #         break
+        # #     input = np.zeros(shape=(1, l, self.input_dim))
+        # #     input[0, :, :] = data_test[i:i + l].copy()
+        # #     yhats = self.model.predict(input)
+        # #     _pd[i + l:i + l + h] = yhats
 
-            # _gt = pm_data[i + l:i + l + h].copy()
-            # pd[i + l:i + l + h] = yhats * (1.0 - _bm) + _gt * _bm
-
-        # rescale metrics
-        residual_row = len(other_features_data) - len(_pd)
-        if residual_row != 0:
-            other_features_data = np.delete(other_features_data,
-                                            np.s_[-residual_row:],
-                                            axis=0)
-        inverse_pred_data = scaler.inverse_transform(
-            np.concatenate((other_features_data, _pd), axis=1))
-        predicted_data = inverse_pred_data[:, -self.output_dim:]
-        inverse_actual_data = scaler.inverse_transform(
-            data_test[:predicted_data.shape[0]])
-        ground_truth = inverse_actual_data[:, -self.output_dim:]
-        np.save(self.log_dir + 'pd', predicted_data)
-        np.save(self.log_dir + 'gt', ground_truth)
-        # save metrics to log dir
-        error_list = utils.cal_error(ground_truth.flatten(),
-                                           predicted_data.flatten())
-        mae = utils.mae(ground_truth.flatten(), predicted_data.flatten())
-        utils.save_metrics(error_list, self.log_dir, "cnn_lstm_attention")
-        return mae
+        # # # rescale metrics
+        # # residual_row = len(other_features_data) - len(_pd)
+        # # if residual_row != 0:
+        # #     other_features_data = np.delete(other_features_data,
+        # #                                     np.s_[-residual_row:],
+        # #                                     axis=0)
+        # # inverse_pred_data = scaler.inverse_transform(
+        # #     np.concatenate((other_features_data, _pd), axis=1))
+        # # predicted_data = inverse_pred_data[:, -self.output_dim:]
+        # # inverse_actual_data = scaler.inverse_transform(
+        # #     data_test[:predicted_data.shape[0]])
+        # # ground_truth = inverse_actual_data[:, -self.output_dim:]
+        # # np.save(self.log_dir + 'pd', predicted_data)
+        # # np.save(self.log_dir + 'gt', ground_truth)
+        # # # save metrics to log dir
+        # # error_list = utils.cal_error(ground_truth.flatten(),
+        # #                                    predicted_data.flatten())
+        # # mae = utils.mae(ground_truth.flatten(), predicted_data.flatten())
+        # # utils.save_metrics(error_list, self.log_dir, "ae_lstm")
+        # return mae
 
     def plot_result(self):
         preds = np.load(self.log_dir + 'pd.npy')
