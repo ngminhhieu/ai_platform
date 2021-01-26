@@ -125,7 +125,7 @@ def _save_model_history(model_history, config_model):
     # training time call back at third position
     training_time_callback = config_model['callbacks'][2]
     if training_time_callback.logs is not None:
-        dump_model_history['training_time'] = training_time_callback.logs
+        dump_model_history['training_time'] = training_time_callback.logs[0] + training_time_callback.logs[1]
 
     # total training time
     dump_model_history.loc[-1, -1] = np.sum(training_time_callback.logs)

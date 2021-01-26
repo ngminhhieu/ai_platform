@@ -42,15 +42,13 @@ class AELSTMSupervisor():
         self.rnn_units = self.config_model['rnn_units']
         self.dropout = self.config_model['dropout']
         self.latent_space = 10
-        # self.model_ae = self.construct_model_ae()
+        self.model_ae = self.construct_model_ae()
         self.model_lstm = self.construct_model_lstm()
 
     def construct_model_ae(self):
         model = Sequential()
         model.add(Dense(self.latent_space, input_shape=(self.seq_len, self.input_dim), activation=self.activation))
         model.add(Dense(self.input_dim, activation=self.activation))
-        # model.add(Bidirectional(LSTM(self.rnn_units, activation=self.activation, dropout=self.dropout)))
-        # model.add(Dense(1, activation=self.activation))
         from keras.utils import plot_model
         plot_model(model=model,
                    to_file=self.log_dir + '/ae_model.png',
@@ -59,7 +57,8 @@ class AELSTMSupervisor():
 
     def construct_model_lstm(self):
         model = Sequential()
-        model.add(Bidirectional(LSTM(self.rnn_units, activation=self.activation, dropout=self.dropout, input_shape=(self.seq_len, self.input_dim))))
+        # bo activation di thi khong bi loi "WARNING:tensorflow:Layer lstm will not use cuDNN kernel since it doesn't meet the cuDNN kernel criteria. It will use generic GPU kernel as fallback when running on GPU"
+        model.add(Bidirectional(LSTM(self.rnn_units, dropout=self.dropout, input_shape=(self.seq_len, self.latent_space))))
         model.add(Dense(1, activation=self.activation))
         from keras.utils import plot_model
         plot_model(model=model,
@@ -91,17 +90,17 @@ class AELSTMSupervisor():
         return outputs_ae, outputs_ae_valid
 
     def train(self):
-        # outputs_ae, outputs_ae_valid = self.train_ae()
+        outputs_ae, outputs_ae_valid = self.train_ae()
         self.model_lstm.compile(optimizer=optimizers.Adam(learning_rate=0.001),
                            loss=self.loss,
                            metrics=['mse', 'mae'])
 
-        training_history = self.model_lstm.fit(self.input_train,
+        training_history = self.model_lstm.fit(outputs_ae,
                                           self.target_train,
                                           batch_size=self.batch_size,
                                           epochs=self.epochs,
                                           callbacks=self.callbacks,
-                                          validation_data=(self.input_valid,
+                                          validation_data=(outputs_ae_valid,
                                                            self.target_valid),
                                           shuffle=True,
                                           verbose=2)
