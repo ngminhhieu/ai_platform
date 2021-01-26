@@ -45,9 +45,8 @@ class AELSTMSupervisor():
     def construct_model(self):
         model = Sequential()
         model.add(Dense(10, input_shape=(self.seq_len, self.input_dim), activation=self.activation))
-
         # model.add(Bidirectional(LSTM(self.rnn_units, activation=self.activation, dropout=self.dropout)))
-        model.Dense(1, activation=self.activation)
+        # model.add(Dense(1, activation=self.activation))
         from keras.utils import plot_model
         plot_model(model=model,
                    to_file=self.log_dir + '/ae_lstm_model.png',
@@ -83,9 +82,8 @@ class AELSTMSupervisor():
                 yaml.dump(config, f, default_flow_style=False)
 
     def test(self):
-        outputs = [K.function([model.input], [layer.output])([self.input_train, 1]) for layer in model.layers]
-        print(outputs)
-        print(outputs.shape)
+        outputs = [K.function([self.model.input], [layer.output])([self.input_train]) for layer in self.model.layers]
+        print(np.array(outputs).shape)
         # # scaler = self.data['scaler']
         # # data_test = self.data['test_data_norm'].copy()
         # # # this is the meterogical data
