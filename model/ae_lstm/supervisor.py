@@ -48,6 +48,7 @@ class AELSTMSupervisor():
     def construct_model_ae(self):
         model = Sequential()
         model.add(Dense(self.latent_space, input_shape=(self.seq_len, self.input_dim), activation=self.activation))
+        model.add(Dense(self.input_dim, activation=self.activation))
         # model.add(Bidirectional(LSTM(self.rnn_units, activation=self.activation, dropout=self.dropout)))
         # model.add(Dense(1, activation=self.activation))
         from keras.utils import plot_model
@@ -66,12 +67,12 @@ class AELSTMSupervisor():
                    show_shapes=True)
         return model
 
-    def train(self):
+    def train_ae(self):
         self.model_ae.compile(optimizer=optimizers.SGD(learning_rate=0.001),
                            loss=self.loss,
                            metrics=['mse', 'mae'])
 
-        self.model_ae.fit(self.input_train,
+        training_history = self.model_ae.fit(self.input_train,
             self.input_train,
             batch_size=self.batch_size,
             epochs=self.epochs,
@@ -81,21 +82,27 @@ class AELSTMSupervisor():
             shuffle=True,
             verbose=2)
 
-        outputs = [K.function([self.model_ae.input], [layer.output])([self.input_train]) for layer in self.model_ae.layers]
-        outputs_ae = np.array(outputs[0][0])
-        outputs = [K.function([self.model_ae.input], [layer.output])([self.input_valid]) for layer in self.model_ae.layers]
-        outputs_ae_valid = np.array(outputs[0][0])
+        outputs = K.function([self.model_ae.input], [self.model_ae.layers[0].output])([self.input_train])
+        # outputs = [K.function([self.model_ae.input], [layer.output])([self.input_train]) for layer in self.model_ae.layers]
+        print(np.array(outputs).shape)
+        outputs_ae = np.array(outputs[0])
+        outputs = K.function([self.model_ae.input], [self.model_ae.layers[0].output])([self.input_valid])
+        # outputs = [K.function([self.model_ae.input], [layer.output])([self.input_valid]) for layer in self.model_ae.layers]
+        outputs_ae_valid = np.array(outputs[0])
+        return outputs_ae, outputs_ae_valid
 
+    def train(self):
+        outputs_ae, outputs_ae_valid = self.train_ae()
         self.model_lstm.compile(optimizer=optimizers.Adam(learning_rate=0.001),
                            loss=self.loss,
                            metrics=['mse', 'mae'])
 
-        training_history = self.model.fit(outputs_ae,
+        training_history = self.model_lstm.fit(outputs_ae,
                                           self.target_train,
                                           batch_size=self.batch_size,
                                           epochs=self.epochs,
                                           callbacks=self.callbacks,
-                                          validation_data=(self.outputs_ae_valid,
+                                          validation_data=(outputs_ae_valid,
                                                            self.target_valid),
                                           shuffle=True,
                                           verbose=2)
