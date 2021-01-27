@@ -48,7 +48,7 @@ class Conv1DLSTMAttentionSupervisor():
                    kernel_size=3,
                    activation=self.activation,
                    input_shape=(self.seq_len, self.input_dim)),
-            LSTM(self.rnn_units, return_sequences=True),
+            LSTM(self.rnn_units, activation=self.activation, return_sequences=True),
             Attention(name='attention_weight'),
             Dense(1, activation=self.activation)
         ])
