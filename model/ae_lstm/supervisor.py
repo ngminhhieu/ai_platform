@@ -166,7 +166,7 @@ class AELSTMSupervisor():
         # save metrics to log dir
         error_list = utils.cal_error(ground_truth.flatten(),
                                            predicted_data.flatten())
-        error_list = error_list.append(inference_time)
+        error_list = error_list + [inference_time]
         mae = utils.mae(ground_truth.flatten(), predicted_data.flatten())
         utils.save_metrics(error_list, self.log_dir, "ae_lstm")
         return mae

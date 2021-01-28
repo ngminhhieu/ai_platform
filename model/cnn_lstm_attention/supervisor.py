@@ -103,7 +103,7 @@ class Conv1DLSTMAttentionSupervisor():
         # pd[:l] = pm_data[:l]
         _pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
         _pd[:l] = pm_data[:l]
-        iterator = tqdm(range(0, T - l - h, h))
+        iterator = tqdm(range(0, 100, h))
         for i in iterator:
             if i + l + h > T - h:
                 # trimm all zero lines
@@ -137,7 +137,7 @@ class Conv1DLSTMAttentionSupervisor():
         # save metrics to log dir
         error_list = utils.cal_error(ground_truth.flatten(),
                                            predicted_data.flatten())
-        error_list = error_list.append(inference_time)
+        error_list = error_list + [inference_time]
         mae = utils.mae(ground_truth.flatten(), predicted_data.flatten())
         utils.save_metrics(error_list, self.log_dir, "cnn_lstm_attention")
         return mae
