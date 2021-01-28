@@ -88,6 +88,7 @@ class Conv1DLSTMAttentionSupervisor():
 
     def test(self):
         scaler = self.data['scaler']
+        start_time = datetime.now()
         data_test = self.data['test_data_norm'].copy()
         # this is the meterogical data
         other_features_data = data_test[:, 0:(self.input_dim -
@@ -116,6 +117,9 @@ class Conv1DLSTMAttentionSupervisor():
             # _gt = pm_data[i + l:i + l + h].copy()
             # pd[i + l:i + l + h] = yhats * (1.0 - _bm) + _gt * _bm
 
+        end_time = datetime.now()
+        inference_time = end_time - start_time
+        inference_time = inference_time.strftime("%H:%M:%S")
         # rescale metrics
         residual_row = len(other_features_data) - len(_pd)
         if residual_row != 0:
@@ -133,6 +137,7 @@ class Conv1DLSTMAttentionSupervisor():
         # save metrics to log dir
         error_list = utils.cal_error(ground_truth.flatten(),
                                            predicted_data.flatten())
+        error_list = error_list.append(inference_time)
         mae = utils.mae(ground_truth.flatten(), predicted_data.flatten())
         utils.save_metrics(error_list, self.log_dir, "cnn_lstm_attention")
         return mae
