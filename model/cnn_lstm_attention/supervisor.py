@@ -12,6 +12,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.losses import mse
 import pandas as pd
 from datetime import datetime
+import time
 import matplotlib.pyplot as plt
 
 
@@ -89,7 +90,7 @@ class Conv1DLSTMAttentionSupervisor():
 
     def test(self):
         scaler = self.data['scaler']
-        start_time = datetime.now()
+        start_time = time.time()
         data_test = self.data['test_data_norm'].copy()
         # this is the meterogical data
         other_features_data = data_test[:, 0:(self.input_dim -
@@ -118,9 +119,7 @@ class Conv1DLSTMAttentionSupervisor():
             # _gt = pm_data[i + l:i + l + h].copy()
             # pd[i + l:i + l + h] = yhats * (1.0 - _bm) + _gt * _bm
 
-        end_time = datetime.now()
-        inference_time = end_time - start_time
-        inference_time = inference_time.strftime("%H:%M:%S")
+        inference_time = (time.time()-start_time)
         # rescale metrics
         residual_row = len(other_features_data) - len(_pd)
         if residual_row != 0:

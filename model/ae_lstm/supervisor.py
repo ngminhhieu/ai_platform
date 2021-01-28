@@ -12,6 +12,7 @@ from tensorflow.keras import optimizers
 from tensorflow.keras.losses import mse
 import pandas as pd
 from datetime import datetime
+import time
 import matplotlib.pyplot as plt
 
 
@@ -121,7 +122,7 @@ class AELSTMSupervisor():
 
     def test(self):
         scaler = self.data['scaler']
-        start_time = datetime.now()
+        start_time = time.time()
         data_test = self.data['test_data_norm'].copy()
         # this is the meterogical data
         other_features_data = data_test[:, 0:(self.input_dim -
@@ -147,9 +148,7 @@ class AELSTMSupervisor():
             yhats = self.model_lstm.predict(outputs_ae)
             _pd[i + l:i + l + h] = yhats
 
-        end_time = datetime.now()
-        inference_time = end_time - start_time
-        inference_time = inference_time.strftime("%H:%M:%S")
+        inference_time = (time.time()-start_time)
         # rescale metrics
         residual_row = len(other_features_data) - len(_pd)
         if residual_row != 0:
