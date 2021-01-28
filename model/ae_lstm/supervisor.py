@@ -1,15 +1,15 @@
-from keras.layers import Dense, LSTM, Input, Bidirectional
-from keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM, Input, Bidirectional
+from tensorflow.keras.models import Sequential
 import numpy as np
 from library import common_util
 import model.ae_lstm.utils as utils
 import os
 import yaml
 from tqdm import tqdm
-from keras.utils import plot_model
-from keras import backend as K
-from keras import optimizers
-from keras.losses import mse
+from tensorflow.keras.utils import plot_model
+from tensorflow.keras import backend as K
+from tensorflow.keras import optimizers
+from tensorflow.keras.losses import mse
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -49,7 +49,7 @@ class AELSTMSupervisor():
         model = Sequential()
         model.add(Dense(self.latent_space, input_shape=(self.seq_len, self.input_dim), activation=self.activation))
         model.add(Dense(self.input_dim, activation=self.activation))
-        from keras.utils import plot_model
+
         plot_model(model=model,
                    to_file=self.log_dir + '/ae_model.png',
                    show_shapes=True)
@@ -60,7 +60,7 @@ class AELSTMSupervisor():
         # bo activation di thi khong bi loi "WARNING:tensorflow:Layer lstm will not use cuDNN kernel since it doesn't meet the cuDNN kernel criteria. It will use generic GPU kernel as fallback when running on GPU"
         model.add(Bidirectional(LSTM(self.rnn_units, activation=self.activation, dropout=self.dropout, input_shape=(self.seq_len, self.latent_space))))
         model.add(Dense(1, activation=self.activation))
-        from keras.utils import plot_model
+
         plot_model(model=model,
                    to_file=self.log_dir + '/lstm_model.png',
                    show_shapes=True)

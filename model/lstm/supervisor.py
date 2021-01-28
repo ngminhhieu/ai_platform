@@ -1,14 +1,14 @@
-from keras.layers import Dense, LSTM, Input
-from keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM, Input
+from tensorflow.keras.models import Sequential
 import numpy as np
 from library import common_util
 import model.lstm.utils as utils
 import os
 import yaml
 from pandas import read_csv
-from keras.utils import plot_model
-from keras import backend as K
-from keras.losses import mse
+from tensorflow.keras.utils import plot_model
+from tensorflow.keras import backend as K
+from tensorflow.keras.losses import mse
 
 
 class LSTMSupervisor():
@@ -46,7 +46,6 @@ class LSTMSupervisor():
         model.add(Dense(self.output_dim))
         print(model.summary())
         # plot model
-        from keras.utils import plot_model
         plot_model(model=model,
                    to_file=self.log_dir + '/lstm_model.png',
                    show_shapes=True)

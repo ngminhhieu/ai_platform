@@ -1,5 +1,5 @@
-from keras.layers import Dense, LSTM, Input, Conv1D
-from keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM, Input, Conv1D
+from tensorflow.keras.models import Sequential
 from model.cnn_lstm_attention.attention import Attention
 import numpy as np
 from library import common_util
@@ -7,9 +7,9 @@ import model.cnn_lstm_attention.utils as utils
 import os
 import yaml
 from tqdm import tqdm
-from keras.utils import plot_model
-from keras import backend as K
-from keras.losses import mse
+from tensorflow.keras.utils import plot_model
+from tensorflow.keras import backend as K
+from tensorflow.keras.losses import mse
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -52,7 +52,7 @@ class Conv1DLSTMAttentionSupervisor():
             Attention(name='attention_weight'),
             Dense(1, activation=self.activation)
         ])
-        from keras.utils import plot_model
+        
         plot_model(model=model,
                    to_file=self.log_dir + '/cnn_lstm_attention_model.png',
                    show_shapes=True)
