@@ -58,7 +58,7 @@ class AELSTMSupervisor():
     def construct_model_lstm(self):
         model = Sequential()
         # bo activation di thi khong bi loi "WARNING:tensorflow:Layer lstm will not use cuDNN kernel since it doesn't meet the cuDNN kernel criteria. It will use generic GPU kernel as fallback when running on GPU"
-        model.add(Bidirectional(LSTM(self.rnn_units, dropout=self.dropout, input_shape=(self.seq_len, self.latent_space))))
+        model.add(Bidirectional(LSTM(self.rnn_units, activation=self.activation, dropout=self.dropout, input_shape=(self.seq_len, self.latent_space))))
         model.add(Dense(1, activation=self.activation))
         from keras.utils import plot_model
         plot_model(model=model,
