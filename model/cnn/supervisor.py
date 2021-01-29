@@ -2,7 +2,7 @@ from tensorflow.keras.layers import Conv2D, BatchNormalization, MaxPooling2D, Up
 from tensorflow.keras.models import Sequential
 import numpy as np
 from library import common_util
-import model.utils.conv2d as utils_conv2d
+import model.cnn.utils as utils_conv2d
 import os
 import yaml
 from pandas import read_csv
