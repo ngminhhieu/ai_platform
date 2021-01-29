@@ -53,23 +53,23 @@ if __name__ == '__main__':
             config = yaml.load(f)
 
     if args.mode == 'train':
-        if args.model = 'cnn':
+        if args.model == 'cnn':
             model = Conv2DSupervisor(**config)
-        elif args.model = 'lstm':
+        elif args.model == 'lstm':
             model = LSTMSupervisor(**config)
-        elif args.model = 'ae_lstm':
+        elif args.model == 'ae_lstm':
             model = AELSTMSupervisor(**config)
-        elif args.model = 'cnn_lstm_attention':
+        elif args.model == 'cnn_lstm_attention':
             model = Conv1DLSTMAttentionSupervisor(**config)
         model.train()
     elif args.mode == 'test':
-        if args.model = 'cnn':
+        if args.model == 'cnn':
             model = Conv2DSupervisor(**config)
-        elif args.model = 'lstm':
+        elif args.model == 'lstm':
             model = LSTMSupervisor(**config)
-        elif args.model = 'ae_lstm':
+        elif args.model == 'ae_lstm':
             model = AELSTMSupervisor(**config)
-        elif args.model = 'cnn_lstm_attention':
+        elif args.model == 'cnn_lstm_attention':
             model = Conv1DLSTMAttentionSupervisor(**config)
         model.test()
         model.plot_result()
