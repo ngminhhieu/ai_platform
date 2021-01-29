@@ -1,5 +1,5 @@
 import numpy as np
-from model import common_util
+from library import common_util
 from sklearn.preprocessing import MinMaxScaler
 from keras import backend as K
 

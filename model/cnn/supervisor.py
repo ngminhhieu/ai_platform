@@ -1,7 +1,7 @@
 from tensorflow.keras.layers import Conv2D, BatchNormalization, MaxPooling2D, UpSampling2D
 from tensorflow.keras.models import Sequential
 import numpy as np
-from model import common_util
+from library import common_util
 import model.utils.conv2d as utils_conv2d
 import os
 import yaml
