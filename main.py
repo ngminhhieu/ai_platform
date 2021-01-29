@@ -35,7 +35,6 @@ if __name__ == '__main__':
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_file',
-                        default='config/cnn_lstm_attention/cnn_lstm_attention.yaml',
                         type=str,
                         help='Config file for pretrained model.')
     parser.add_argument('--mode',
