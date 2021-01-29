@@ -73,7 +73,7 @@ def get_config_model(**kwargs):
                                            verbose=1,
                                            save_best_only=True,
                                            mode='auto',
-                                           period=1)
+                                           save_freq='epoch')
     earlystopping_callback = EarlyStopping(monitor='val_loss',
                                            patience=config_model['patience'],
                                            verbose=1,

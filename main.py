@@ -50,7 +50,7 @@ if __name__ == '__main__':
     # load config for seq2seq model
     if args.config_file != False:
         with open(args.config_file) as f:
-            config = yaml.load(f)
+            config = yaml.safe_load(f)
 
     if args.mode == 'train':
         if args.model == 'cnn':
