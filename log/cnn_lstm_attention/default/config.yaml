@@ -18,5 +18,5 @@ train:
   epochs: 300
   log_dir: log/cnn_lstm_attention/default/
   loss: mse
-  optimizer: adadelta
+  optimizer: adam
   patience: 10
