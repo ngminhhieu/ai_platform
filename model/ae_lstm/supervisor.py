@@ -49,7 +49,10 @@ class AELSTMSupervisor():
 
     def construct_model_ae(self):
         model = Sequential()
-        model.add(Dense(self.latent_space, input_shape=(self.seq_len, self.input_dim), activation=self.activation))
+        model.add(
+            Dense(self.latent_space,
+                  input_shape=(self.seq_len, self.input_dim),
+                  activation=self.activation))
         model.add(Dense(self.input_dim, activation=self.activation))
 
         plot_model(model=model,
@@ -60,7 +63,12 @@ class AELSTMSupervisor():
     def construct_model_lstm(self):
         model = Sequential()
         # bo activation di thi khong bi loi "WARNING:tensorflow:Layer lstm will not use cuDNN kernel since it doesn't meet the cuDNN kernel criteria. It will use generic GPU kernel as fallback when running on GPU"
-        model.add(Bidirectional(LSTM(self.rnn_units, activation=self.activation, dropout=self.dropout, input_shape=(self.seq_len, self.latent_space))))
+        model.add(
+            Bidirectional(
+                LSTM(self.rnn_units,
+                     activation=self.activation,
+                     dropout=self.dropout,
+                     input_shape=(self.seq_len, self.latent_space))))
         model.add(Dense(1, activation=self.activation))
 
         plot_model(model=model,
@@ -70,23 +78,27 @@ class AELSTMSupervisor():
 
     def train_ae(self):
         self.model_ae.compile(optimizer=optimizers.SGD(learning_rate=0.001),
-                           loss=self.loss,
-                           metrics=['mse', 'mae'])
+                              loss=self.loss,
+                              metrics=['mse', 'mae'])
 
-        training_history = self.model_ae.fit(self.input_train,
+        training_history = self.model_ae.fit(
+            self.input_train,
             self.input_train,
             batch_size=self.batch_size,
             epochs=self.epochs,
             callbacks=self.callbacks,
-            validation_data=(self.input_valid,
-                            self.input_valid),
+            validation_data=(self.input_valid, self.input_valid),
             shuffle=True,
             verbose=2)
 
-        outputs = K.function([self.model_ae.input], [self.model_ae.layers[0].output])([self.input_train])
+        outputs = K.function([self.model_ae.input],
+                             [self.model_ae.layers[0].output])(
+                                 [self.input_train])
         # outputs = [K.function([self.model_ae.input], [layer.output])([self.input_train]) for layer in self.model_ae.layers]
         outputs_ae = np.array(outputs[0])
-        outputs = K.function([self.model_ae.input], [self.model_ae.layers[0].output])([self.input_valid])
+        outputs = K.function([self.model_ae.input],
+                             [self.model_ae.layers[0].output])(
+                                 [self.input_valid])
         # outputs = [K.function([self.model_ae.input], [layer.output])([self.input_valid]) for layer in self.model_ae.layers]
         outputs_ae_valid = np.array(outputs[0])
         return outputs_ae, outputs_ae_valid
@@ -94,18 +106,18 @@ class AELSTMSupervisor():
     def train(self):
         outputs_ae, outputs_ae_valid = self.train_ae()
         self.model_lstm.compile(optimizer=optimizers.Adam(learning_rate=0.001),
-                           loss=self.loss,
-                           metrics=['mse', 'mae'])
+                                loss=self.loss,
+                                metrics=['mse', 'mae'])
 
-        training_history = self.model_lstm.fit(outputs_ae,
-                                          self.target_train,
-                                          batch_size=self.batch_size,
-                                          epochs=self.epochs,
-                                          callbacks=self.callbacks,
-                                          validation_data=(outputs_ae_valid,
-                                                           self.target_valid),
-                                          shuffle=True,
-                                          verbose=2)
+        training_history = self.model_lstm.fit(
+            outputs_ae,
+            self.target_train,
+            batch_size=self.batch_size,
+            epochs=self.epochs,
+            callbacks=self.callbacks,
+            validation_data=(outputs_ae_valid, self.target_valid),
+            shuffle=True,
+            verbose=2)
 
         if training_history is not None:
             common_util._plot_training_history(training_history,
@@ -148,7 +160,7 @@ class AELSTMSupervisor():
             yhats = self.model_lstm.predict(outputs_ae)
             _pd[i + l:i + l + h] = yhats
 
-        inference_time = (time.time()-start_time)
+        inference_time = (time.time() - start_time)
         # rescale metrics
         residual_row = len(other_features_data) - len(_pd)
         if residual_row != 0:
@@ -165,7 +177,7 @@ class AELSTMSupervisor():
         np.save(self.log_dir + 'gt', ground_truth)
         # save metrics to log dir
         error_list = utils.cal_error(ground_truth.flatten(),
-                                           predicted_data.flatten())
+                                     predicted_data.flatten())
         error_list = error_list + [inference_time]
         mae = utils.mae(ground_truth.flatten(), predicted_data.flatten())
         utils.save_metrics(error_list, self.log_dir, "ae_lstm")

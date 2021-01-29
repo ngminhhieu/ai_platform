@@ -50,11 +50,13 @@ class Conv1DLSTMAttentionSupervisor():
                    kernel_size=3,
                    activation=self.activation,
                    input_shape=(self.seq_len, self.input_dim)),
-            LSTM(self.rnn_units, activation=self.activation, return_sequences=True),
+            LSTM(self.rnn_units,
+                 activation=self.activation,
+                 return_sequences=True),
             Attention(name='attention_weight'),
             Dense(1, activation=self.activation)
         ])
-        
+
         plot_model(model=model,
                    to_file=self.log_dir + '/cnn_lstm_attention_model.png',
                    show_shapes=True)
@@ -103,7 +105,7 @@ class Conv1DLSTMAttentionSupervisor():
         # pd[:l] = pm_data[:l]
         _pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
         _pd[:l] = pm_data[:l]
-        iterator = tqdm(range(0, 100, h))
+        iterator = tqdm(range(0, T - l - h, h))
         for i in iterator:
             if i + l + h > T - h:
                 # trimm all zero lines
@@ -119,7 +121,7 @@ class Conv1DLSTMAttentionSupervisor():
             # _gt = pm_data[i + l:i + l + h].copy()
             # pd[i + l:i + l + h] = yhats * (1.0 - _bm) + _gt * _bm
 
-        inference_time = (time.time()-start_time)
+        inference_time = (time.time() - start_time)
         # rescale metrics
         residual_row = len(other_features_data) - len(_pd)
         if residual_row != 0:
@@ -136,7 +138,7 @@ class Conv1DLSTMAttentionSupervisor():
         np.save(self.log_dir + 'gt', ground_truth)
         # save metrics to log dir
         error_list = utils.cal_error(ground_truth.flatten(),
-                                           predicted_data.flatten())
+                                     predicted_data.flatten())
         error_list = error_list + [inference_time]
         mae = utils.mae(ground_truth.flatten(), predicted_data.flatten())
         utils.save_metrics(error_list, self.log_dir, "cnn_lstm_attention")

@@ -5,6 +5,9 @@ import sys
 import numpy as np
 import yaml
 import random as rn
+from model.cnn.supervisor import Conv2DSupervisor
+from model.lstm.supervisor import LSTMSupervisor
+from model.ae_lstm.supervisor import AELSTMSupervisor
 from model.cnn_lstm_attention.supervisor import Conv1DLSTMAttentionSupervisor
 import tensorflow as tf
 
@@ -39,6 +42,9 @@ if __name__ == '__main__':
                         default='train',
                         type=str,
                         help='Run mode.')
+    parser.add_argument('--model',
+                        type=str,
+                        help='Select model.')
     args = parser.parse_args()
 
     # load config for seq2seq model
@@ -47,11 +53,24 @@ if __name__ == '__main__':
             config = yaml.load(f)
 
     if args.mode == 'train':
-        model = Conv1DLSTMAttentionSupervisor(**config)
+        if args.model = 'cnn':
+            model = Conv2DSupervisor(**config)
+        elif args.model = 'lstm':
+            model = LSTMSupervisor(**config)
+        elif args.model = 'ae_lstm':
+            model = AELSTMSupervisor(**config)
+        elif args.model = 'cnn_lstm_attention':
+            model = Conv1DLSTMAttentionSupervisor(**config)
         model.train()
     elif args.mode == 'test':
-        # predict
-        model = Conv1DLSTMAttentionSupervisor(**config)
+        if args.model = 'cnn':
+            model = Conv2DSupervisor(**config)
+        elif args.model = 'lstm':
+            model = LSTMSupervisor(**config)
+        elif args.model = 'ae_lstm':
+            model = AELSTMSupervisor(**config)
+        elif args.model = 'cnn_lstm_attention':
+            model = Conv1DLSTMAttentionSupervisor(**config)
         model.test()
         model.plot_result()
     else:
