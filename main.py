@@ -1,6 +1,6 @@
 import argparse
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 import sys
 import numpy as np
 import yaml
@@ -15,6 +15,19 @@ import tensorflow as tf
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
 session = tf.compat.v1.Session(config=config)
+
+def checkGPU():
+    print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        # Restrict TensorFlow to only use the first GPU
+        try:
+            tf.config.experimental.set_visible_devices(gpus[0], 'GPU')
+            logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+            print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
+        except RuntimeError as e:
+            # Visible devices must be set before GPUs have been initialized
+            print(e)
 
 def seed():
     # The below is necessary for starting Numpy generated random numbers
@@ -31,6 +44,7 @@ def seed():
 
 
 if __name__ == '__main__':
+    checkGPU()
     seed()
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
