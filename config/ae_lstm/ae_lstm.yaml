@@ -15,7 +15,7 @@ model:
   horizon: 1
 train:
   dropout: 0.5
-  epochs: 300
+  epochs: 20
   optimizer: adam
   patience: 10
   loss: mse
