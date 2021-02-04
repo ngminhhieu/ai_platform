@@ -1,5 +1,5 @@
 from tensorflow.keras.layers import Dense, LSTM, Input, Bidirectional
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential, Model
 import numpy as np
 from library import common_util
 import model.ae_lstm.utils as utils
@@ -143,7 +143,7 @@ class AELSTMSupervisor():
         T = len(data_test)
         l = self.seq_len
         h = self.horizon
-        _pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
+        _pd = np.empty(shape=(T, self.output_dim), dtype='float32')
         _pd[:l] = pm_data[:l]
         iterator = tqdm(range(0, T - l - h, h))
         for i in iterator:
@@ -155,8 +155,11 @@ class AELSTMSupervisor():
                 break
             input = np.zeros(shape=(1, l, self.input_dim))
             input[0, :, :] = data_test[i:i + l].copy()
-            # yhats = self.model.predict(input)
-            outputs_ae = self.model_ae.predict(input)
+            layer_output = self.model_ae.layers[0].output
+            intermediate_model = Model(inputs=self.model_ae.input,
+                                       outputs=layer_output)
+            outputs_ae = intermediate_model.predict(input)
+            # outputs_ae = self.model_ae.predict(input)
             yhats = self.model_lstm.predict(outputs_ae)
             _pd[i + l:i + l + h] = yhats
 
