@@ -46,7 +46,7 @@ class Conv1DLSTMAttentionSupervisor():
 
     def construct_model(self):
         model = Sequential([
-            Conv1D(filters=64,
+            Conv1D(filters=1,
                    kernel_size=3,
                    activation=self.activation,
                    input_shape=(self.seq_len, self.input_dim)),
