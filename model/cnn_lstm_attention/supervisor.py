@@ -105,7 +105,7 @@ class Conv1DLSTMAttentionSupervisor():
         # pd[:l] = pm_data[:l]
         _pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
         _pd[:l] = pm_data[:l]
-        iterator = tqdm(range(0, 400, h))
+        iterator = tqdm(range(0, T - l - h, h))
         for i in iterator:
             if i + l + h > T - h:
                 # trimm all zero lines
