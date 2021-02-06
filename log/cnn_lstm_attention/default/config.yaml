@@ -19,4 +19,4 @@ train:
   log_dir: log/cnn_lstm_attention/default/
   loss: mse
   optimizer: adam
-  patience: 15
+  patience: 50

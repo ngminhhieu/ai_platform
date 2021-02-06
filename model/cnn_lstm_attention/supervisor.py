@@ -58,8 +58,8 @@ class Conv1DLSTMAttentionSupervisor():
         #     Dense(1, activation=self.activation)
         # ])
         model = Sequential()
-        model.add(Conv1D(filters=32,
-                   kernel_size=8,
+        model.add(Conv1D(filters=16,
+                   kernel_size=3,
                    activation=self.activation,
                    padding='same',
                    input_shape=(self.seq_len, self.input_dim)))
