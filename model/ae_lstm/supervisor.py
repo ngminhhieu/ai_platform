@@ -43,7 +43,7 @@ class AELSTMSupervisor():
         self.output_dim = self.config_model['output_dim']
         self.rnn_units = self.config_model['rnn_units']
         self.dropout = self.config_model['dropout']
-        self.latent_space = int(self.input_dim/2)
+        self.latent_space = 10 
         self.model_ae = self.construct_model_ae()
         self.model_lstm = self.construct_model_lstm()
 
