@@ -1,5 +1,5 @@
 from tensorflow.keras.layers import Dense, LSTM, Input, Conv1D
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential, Model
 from model.cnn_lstm_attention.attention import Attention
 import numpy as np
 from library import common_util
@@ -45,18 +45,29 @@ class Conv1DLSTMAttentionSupervisor():
         self.model = self.construct_model()
 
     def construct_model(self):
-        model = Sequential([
-            Conv1D(filters=32,
+        # model = Sequential([
+        #     Conv1D(filters=64,
+        #            kernel_size=3,
+        #            activation=self.activation,
+        #            padding='same',
+        #            input_shape=(self.seq_len, self.input_dim)),
+        #     LSTM(self.rnn_units,
+        #          activation=self.activation,
+        #          return_sequences=True),
+        #     Attention(name='attention_weight'),
+        #     Dense(1, activation=self.activation)
+        # ])
+        model = Sequential()
+        model.add(Conv1D(filters=32,
                    kernel_size=8,
                    activation=self.activation,
                    padding='same',
-                   input_shape=(self.seq_len, self.input_dim)),
-            LSTM(self.rnn_units,
+                   input_shape=(self.seq_len, self.input_dim)))
+        model.add(LSTM(self.rnn_units,
                  activation=self.activation,
-                 return_sequences=True),
-            Attention(name='attention_weight'),
-            Dense(1, activation=self.activation)
-        ])
+                 return_sequences=True))
+        model.add(Attention(name='attention_weight'))
+        model.add(Dense(1, activation=self.activation))
 
         plot_model(model=model,
                    to_file=self.log_dir + '/cnn_lstm_attention_model.png',
@@ -106,7 +117,7 @@ class Conv1DLSTMAttentionSupervisor():
         # pd[:l] = pm_data[:l]
         _pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
         _pd[:l] = pm_data[:l]
-        iterator = tqdm(range(0, T - l - h, h))
+        iterator = tqdm(range(0, 300, h))
         for i in iterator:
             if i + l + h > T - h:
                 # trimm all zero lines
@@ -116,6 +127,10 @@ class Conv1DLSTMAttentionSupervisor():
                 break
             input = np.zeros(shape=(1, l, self.input_dim))
             input[0, :, :] = data_test[i:i + l].copy()
+            # layer_output = self.model.layers[0].output
+            # intermediate_model = Model(inputs=self.model.input,
+            #                            outputs=layer_output)
+            # yhats_pd = intermediate_model.predict(input)
             yhats = self.model.predict(input)
             _pd[i + l:i + l + h] = yhats
 
