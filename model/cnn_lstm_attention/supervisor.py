@@ -44,6 +44,8 @@ class Conv1DLSTMAttentionSupervisor():
         self.rnn_units = self.config_model['rnn_units']
         self.model = self.construct_model()
 
+        self.timestep = kwargs['model'].get('timestep')
+
     def construct_model(self):
         # model = Sequential([
         #     Conv1D(filters=64,
@@ -112,30 +114,23 @@ class Conv1DLSTMAttentionSupervisor():
         pm_data = data_test[:, -self.output_dim:].copy()
         T = len(data_test)
         l = self.seq_len
-        h = self.horizon
-        # pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
-        # pd[:l] = pm_data[:l]
+        h = self.timestep
         _pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
         _pd[:l] = pm_data[:l]
         iterator = tqdm(range(0, T - l - h, h))
         for i in iterator:
             if i + l + h > T - h:
-                # trimm all zero lines
-                # pd = pd[~np.all(pd==0, axis=1)]
                 _pd = _pd[~np.all(_pd == 0, axis=1)]
                 iterator.close()
                 break
             input = np.zeros(shape=(1, l, self.input_dim))
             input[0, :, :] = data_test[i:i + l].copy()
-            # layer_output = self.model.layers[0].output
-            # intermediate_model = Model(inputs=self.model.input,
-            #                            outputs=layer_output)
-            # yhats_pd = intermediate_model.predict(input)
-            yhats = self.model.predict(input)
-            _pd[i + l:i + l + h] = yhats
-
-            # _gt = pm_data[i + l:i + l + h].copy()
-            # pd[i + l:i + l + h] = yhats * (1.0 - _bm) + _gt * _bm
+            yhats = np.empty(shape=(h,1))
+            for timestep in range(h):
+                yhat = self.model.predict(input)
+                yhats[timestep] = yhat
+                
+            _pd[i + l:i + l + h] = yhats.copy()     
 
         inference_time = (time.time() - start_time)
         # rescale metrics

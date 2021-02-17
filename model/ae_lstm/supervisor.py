@@ -47,6 +47,8 @@ class AELSTMSupervisor():
         self.model_ae = self.construct_model_ae()
         self.model_lstm = self.construct_model_lstm()
 
+        self.timestep = kwargs['model'].get('timestep')
+
     def construct_model_ae(self):
         model = Sequential()
         model.add(
@@ -142,7 +144,7 @@ class AELSTMSupervisor():
         pm_data = data_test[:, -self.output_dim:].copy()
         T = len(data_test)
         l = self.seq_len
-        h = self.horizon
+        h = self.timestep
         _pd = np.empty(shape=(T, self.output_dim), dtype='float32')
         _pd[:l] = pm_data[:l]
         iterator = tqdm(range(0, T - l - h, h))
@@ -155,13 +157,18 @@ class AELSTMSupervisor():
                 break
             input = np.zeros(shape=(1, l, self.input_dim))
             input[0, :, :] = data_test[i:i + l].copy()
-            layer_output = self.model_ae.layers[0].output
-            intermediate_model = Model(inputs=self.model_ae.input,
-                                       outputs=layer_output)
-            outputs_ae = intermediate_model.predict(input)
-            # outputs_ae = self.model_ae.predict(input)
-            yhats = self.model_lstm.predict(outputs_ae)
-            _pd[i + l:i + l + h] = yhats
+
+            yhats = np.empty(shape=(h,1))
+            for timestep in range(h):
+                layer_output = self.model_ae.layers[0].output
+                intermediate_model = Model(inputs=self.model_ae.input,
+                                        outputs=layer_output)
+                outputs_ae = intermediate_model.predict(input)
+                # outputs_ae = self.model_ae.predict(input)
+                yhat = self.model_lstm.predict(outputs_ae)
+                yhats[timestep] = yhat
+
+            _pd[i + l:i + l + h] = yhats.copy()
 
         inference_time = (time.time() - start_time)
         # rescale metrics
