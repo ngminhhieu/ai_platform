@@ -35,12 +35,12 @@ def seed():
     np.random.seed(2)
     # The below is necessary for starting core Python generated random numbers
     # in a well-defined state.
-    rn.seed(12345)
+    rn.seed(1)
     # The below tf.set_random_seed() will make random number generation
     # in the TensorFlow backend have a well-defined initial state.
     # For further details, see:
     # https://www.tensorflow.org/api_docs/python/tf/set_random_seed
-    tf.random.set_seed(1234)
+    tf.compat.v1.set_random_seed(12345)
 
 
 if __name__ == '__main__':
