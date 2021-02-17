@@ -123,13 +123,16 @@ class Conv1DLSTMAttentionSupervisor():
                 _pd = _pd[~np.all(_pd == 0, axis=1)]
                 iterator.close()
                 break
-            input = np.zeros(shape=(1, l, self.input_dim))
-            input[0, :, :] = data_test[i:i + l].copy()
+
             yhats = np.empty(shape=(h,1))
-            for timestep in range(h):
-                yhat = self.model.predict(input)
+            input_model = np.zeros(shape=(1, l, self.input_dim))
+            input_model[0, :, :] = data_test[i:i + l].copy()
+            for timestep in range(h):   
+                yhat = self.model.predict(input_model)
                 yhats[timestep] = yhat
-                
+                input_model[0, 0:-1, :] = input_model[0, 1:l, :].copy()
+                input_model[0, -1, :] = yhat 
+
             _pd[i + l:i + l + h] = yhats.copy()     
 
         inference_time = (time.time() - start_time)

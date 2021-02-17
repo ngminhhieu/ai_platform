@@ -155,18 +155,19 @@ class AELSTMSupervisor():
                 _pd = _pd[~np.all(_pd == 0, axis=1)]
                 iterator.close()
                 break
-            input = np.zeros(shape=(1, l, self.input_dim))
-            input[0, :, :] = data_test[i:i + l].copy()
-
+            input_model = np.zeros(shape=(1, l, self.input_dim))
+            input_model[0, :, :] = data_test[i:i + l].copy()
             yhats = np.empty(shape=(h,1))
             for timestep in range(h):
                 layer_output = self.model_ae.layers[0].output
                 intermediate_model = Model(inputs=self.model_ae.input,
                                         outputs=layer_output)
-                outputs_ae = intermediate_model.predict(input)
+                outputs_ae = intermediate_model.predict(input_model)
                 # outputs_ae = self.model_ae.predict(input)
                 yhat = self.model_lstm.predict(outputs_ae)
                 yhats[timestep] = yhat
+                input_model[0, 0:-1, :] = input_model[0, 1:, :].copy()
+                input_model[0, -1, :] = yhat 
 
             _pd[i + l:i + l + h] = yhats.copy()
 
