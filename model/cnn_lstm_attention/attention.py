@@ -29,6 +29,6 @@ class Attention(Layer):
         # (batch_size, time_steps, hidden_size) dot (batch_size, time_steps) => (batch_size, hidden_size)
         context_vector = dot([hidden_states, attention_weights], [1, 1], name='context_vector')
         pre_activation = concatenate([context_vector, h_t], name='attention_output')
-        # attention_vector = Dense(128, use_bias=False, activation='tanh', name='attention_vector')(pre_activation)
-        # return attention_vector
-        return pre_activation
+        attention_vector = Dense(128, use_bias=False, activation='tanh', name='attention_vector')(pre_activation)
+        return attention_vector
+        # return pre_activation
