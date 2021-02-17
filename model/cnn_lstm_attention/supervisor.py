@@ -130,7 +130,7 @@ class Conv1DLSTMAttentionSupervisor():
             for timestep in range(h):   
                 yhat = self.model.predict(input_model)
                 yhats[timestep] = yhat
-                input_model[0, 0:-1, :] = input_model[0, 1:l, :].copy()
+                input_model[0, 0:-1, :] = input_model[0, 1:, :].copy()
                 input_model[0, -1, :] = yhat 
 
             _pd[i + l:i + l + h] = yhats.copy()     
