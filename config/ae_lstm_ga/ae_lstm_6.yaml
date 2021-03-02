@@ -9,7 +9,7 @@ log_level: INFO
 model:
   rnn_units: 50
   activation: relu
-  input_dim: 5
+  input_dim: 6
   output_dim: 1
   seq_len: 48
   horizon: 1
