@@ -11,7 +11,7 @@ model:
   activation: relu
   input_dim: 6
   output_dim: 1
-  seq_len: 72
+  seq_len: 48
   horizon: 1
   timestep: 1
 train:
