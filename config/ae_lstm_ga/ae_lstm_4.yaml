@@ -1,7 +1,7 @@
-base_dir: log/ae_lstm_4/
+base_dir: log/ae_lstm_4_ga/
 data:
   batch_size: 200
-  dataset: data/ae_lstm/taiwan.csv
+  dataset: data/ae_lstm/hanoi.csv
   test_batch_size: 1
   test_size: 0.2
   valid_size: 0.2

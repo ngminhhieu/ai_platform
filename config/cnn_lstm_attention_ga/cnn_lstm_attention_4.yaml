@@ -1,21 +1,21 @@
-base_dir: log/ae_lstm_4/
+base_dir: log/cnn_lstm_attention_4_ga/
 data:
   batch_size: 200
-  dataset: data/ae_lstm/taiwan.csv
+  dataset: data/cnn_lstm_attention/hanoi.csv
   test_batch_size: 1
   test_size: 0.2
   valid_size: 0.2
 log_level: INFO
 model:
-  rnn_units: 50
+  rnn_units: 100
   activation: relu
   input_dim: 6
   output_dim: 1
-  seq_len: 72
+  seq_len: 12
   horizon: 1
   timestep: 4
 train:
-  dropout: 0.5
+  dropout: 0
   epochs: 300
   optimizer: adam
   patience: 300

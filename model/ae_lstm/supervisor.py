@@ -194,6 +194,18 @@ class AELSTMSupervisor():
         utils.save_metrics(error_list, self.log_dir, "ae_lstm")
         return mae
 
+    def get_inference_time_per_prediction(self):
+        data_test = self.data['test_data_norm'].copy()
+        T = len(data_test)
+        l = self.seq_len
+        h = self.timestep
+        number = int((T-l-h)/h)
+        for i in range(1,7):
+            dataset = pd.read_csv('./log/ae_lstm_{}/default/ae_lstm_metrics.csv'.format(str(i)), header=None).to_numpy()
+            time = dataset[-1, -1]
+            average_time = time/number
+            print("ae_lstm_", str(i), ": ", average_time)
+
     def plot_result(self):
         preds = np.load(self.log_dir + 'pd.npy')
         gt = np.load(self.log_dir + 'gt.npy')
