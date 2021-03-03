@@ -105,6 +105,11 @@ class Conv1DLSTMAttentionSupervisor():
                 yaml.dump(config, f, default_flow_style=False)
 
     def test(self):
+        self.model.load_weights(self.log_dir + 'best_model.hdf5')
+        for ts in range(1, self.timestep+1):
+            self._test(ts)
+
+    def _test(self, ts):
         scaler = self.data['scaler']
         start_time = time.time()
         data_test = self.data['test_data_norm'].copy()
@@ -114,10 +119,10 @@ class Conv1DLSTMAttentionSupervisor():
         pm_data = data_test[:, -self.output_dim:].copy()
         T = len(data_test)
         l = self.seq_len
-        h = self.timestep
+        h = ts
         _pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
         _pd[:l] = pm_data[:l]
-        iterator = tqdm(range(0, T - l - h, h))
+        iterator = tqdm(range(0, 12, h))
         for i in iterator:
             if i + l + h > T - h:
                 _pd = _pd[~np.all(_pd == 0, axis=1)]
@@ -164,11 +169,11 @@ class Conv1DLSTMAttentionSupervisor():
         l = self.seq_len
         h = self.timestep
         number = int((T-l-h)/h)
-        for i in range(1,7):
-            dataset = pd.read_csv('./log/cnn_lstm_attention_{}/default/cnn_lstm_attention_metrics.csv'.format(str(i)), header=None).to_numpy()
-            time = dataset[-1, -1]
+        for i in range(h):
+            dataset = pd.read_csv('./log/cnn_lstm_attention_ga/default/cnn_lstm_attention_metrics.csv'.format(str(i)), header=None).to_numpy()
+            time = dataset[-i, -1]
             average_time = time/number
-            print("cnn_lstm_attention_", str(i), ": ", average_time)
+            print("cnn_lstm_attention_", str(i+1), ": ", average_time)
 
     def plot_result(self):
         preds = np.load(self.log_dir + 'pd.npy')

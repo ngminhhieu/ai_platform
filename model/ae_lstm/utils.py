@@ -37,7 +37,7 @@ def load_dataset(**kwargs):
     test_size = kwargs['data'].get('test_size')
     valid_size = kwargs['data'].get('valid_size')
     # dataset = read_csv(dataset_path, usecols=['AMB_TEMP', 'RH', 'WIND_DIREC', 'WIND_SPEED', 'PM10', 'PM2.5'])
-    # dataset = read_csv(dataset_path, usecols=['WIND_SPEED', 'TEMP', 'PM10', 'PM2.5'])
+    # dataset = read_csv(dataset_path, usecols=['WIND_SPEED', 'TEMP', 'RADIATION', 'PM10', 'PM2.5'])
     dataset = read_csv(dataset_path, usecols=['TEMP', 'WIND_SPEED', 'WIND_DIR', 'RH', 'PM10', 'PM2.5'])
     train_data2d, valid_data2d, test_data2d = common_util.prepare_train_valid_test(
         data=dataset, test_size=test_size, valid_size=valid_size)

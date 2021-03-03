@@ -135,6 +135,12 @@ class AELSTMSupervisor():
                 yaml.dump(config, f, default_flow_style=False)
 
     def test(self):
+        self.model.load_weights(self.log_dir + 'best_model.hdf5')
+        for ts in range(1, self.timestep+1):
+            self._test(ts)
+
+    def _test(self, ts):
+        self.model = self.model.load_weights(self.log_dir + 'best_model.hdf5')
         scaler = self.data['scaler']
         start_time = time.time()
         data_test = self.data['test_data_norm'].copy()
@@ -144,7 +150,7 @@ class AELSTMSupervisor():
         pm_data = data_test[:, -self.output_dim:].copy()
         T = len(data_test)
         l = self.seq_len
-        h = self.timestep
+        h = self.ts
         _pd = np.empty(shape=(T, self.output_dim), dtype='float32')
         _pd[:l] = pm_data[:l]
         iterator = tqdm(range(0, T - l - h, h))
@@ -200,11 +206,11 @@ class AELSTMSupervisor():
         l = self.seq_len
         h = self.timestep
         number = int((T-l-h)/h)
-        for i in range(1,7):
-            dataset = pd.read_csv('./log/ae_lstm_{}/default/ae_lstm_metrics.csv'.format(str(i)), header=None).to_numpy()
-            time = dataset[-1, -1]
+        for i in range(h):
+            dataset = pd.read_csv('./log/ae_lstm_ga/default/ae_lstm_metrics.csv'.format(str(i)), header=None).to_numpy()
+            time = dataset[-i, -1]
             average_time = time/number
-            print("ae_lstm_", str(i), ": ", average_time)
+            print("ae_lstm_", str(i+1), ": ", average_time)
 
     def plot_result(self):
         preds = np.load(self.log_dir + 'pd.npy')
