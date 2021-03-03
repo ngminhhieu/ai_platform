@@ -1,4 +1,4 @@
-base_dir: log/ae_lstm_ga/
+base_dir: log/ae_lstm_ga/ae_lstm/
 data:
   batch_size: 200
   dataset: data/ae_lstm/hanoi.csv

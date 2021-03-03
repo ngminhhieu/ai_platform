@@ -7,7 +7,8 @@ import yaml
 import random as rn
 from model.cnn.supervisor import Conv2DSupervisor
 from model.lstm.supervisor import LSTMSupervisor
-from model.ae_lstm.supervisor import AELSTMSupervisor
+from model.ae_lstm.supervisor_ae import AESupervisor
+from model.ae_lstm.supervisor_lstm import AELSTMSupervisor
 from model.cnn_lstm_attention.supervisor import Conv1DLSTMAttentionSupervisor
 import tensorflow as tf
 
@@ -68,24 +69,36 @@ if __name__ == '__main__':
     if args.mode == 'train':
         if args.model == 'cnn':
             model = Conv2DSupervisor(**config)
+            model.train()
         elif args.model == 'lstm':
             model = LSTMSupervisor(**config)
+            model.train()
         elif args.model == 'ae_lstm':
+            with open("config/ae_lstm_ga/ae.yaml") as f:
+                config_ae = yaml.safe_load(f)
+            model_ae = AESupervisor(**config_ae)
+            input_train_data, valid_train_data = model_ae.train()
             model = AELSTMSupervisor(**config)
+            model.train(input_train_data, valid_train_data)
         elif args.model == 'cnn_lstm_attention':
             model = Conv1DLSTMAttentionSupervisor(**config)
-        model.train()
+            model.train()
     elif args.mode == 'test':
         if args.model == 'cnn':
             model = Conv2DSupervisor(**config)
         elif args.model == 'lstm':
             model = LSTMSupervisor(**config)
         elif args.model == 'ae_lstm':
+            with open("config/ae_lstm_ga/ae.yaml") as f:
+                config_ae = yaml.safe_load(f)
+            model_ae = AESupervisor(**config_ae)
+            pretrained_model_ae = model_ae.load_weights()
             model = AELSTMSupervisor(**config)
+            model.test(pretrained_model_ae)
+            model.get_inference_time_per_prediction()
         elif args.model == 'cnn_lstm_attention':
             model = Conv1DLSTMAttentionSupervisor(**config)
-        model.test()
-        model.plot_result()
-        model.get_inference_time_per_prediction()
+            model.test()
+            model.get_inference_time_per_prediction()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")

@@ -44,25 +44,11 @@ class AELSTMSupervisor():
         self.rnn_units = self.config_model['rnn_units']
         self.dropout = self.config_model['dropout']
         self.latent_space = 10 
-        self.model_ae = self.construct_model_ae()
-        self.model_lstm = self.construct_model_lstm()
+        self.model = self.construct_model()
 
         self.timestep = kwargs['model'].get('timestep')
 
-    def construct_model_ae(self):
-        model = Sequential()
-        model.add(
-            Dense(self.latent_space,
-                  input_shape=(self.seq_len, self.input_dim),
-                  activation=self.activation))
-        model.add(Dense(self.input_dim, activation=self.activation))
-
-        plot_model(model=model,
-                   to_file=self.log_dir + '/ae_model.png',
-                   show_shapes=True)
-        return model
-
-    def construct_model_lstm(self):
+    def construct_model(self):
         model = Sequential()
         # bo activation di thi khong bi loi "WARNING:tensorflow:Layer lstm will not use cuDNN kernel since it doesn't meet the cuDNN kernel criteria. It will use generic GPU kernel as fallback when running on GPU"
         model.add(
@@ -78,46 +64,19 @@ class AELSTMSupervisor():
                    show_shapes=True)
         return model
 
-    def train_ae(self):
-        self.model_ae.compile(optimizer=optimizers.SGD(learning_rate=0.001),
-                              loss=self.loss,
-                              metrics=['mse', 'mae'])
 
-        training_history = self.model_ae.fit(
-            self.input_train,
-            self.input_train,
-            batch_size=self.batch_size,
-            epochs=self.epochs,
-            callbacks=self.callbacks,
-            validation_data=(self.input_valid, self.input_valid),
-            shuffle=True,
-            verbose=2)
-
-        outputs = K.function([self.model_ae.input],
-                             [self.model_ae.layers[0].output])(
-                                 [self.input_train])
-        # outputs = [K.function([self.model_ae.input], [layer.output])([self.input_train]) for layer in self.model_ae.layers]
-        outputs_ae = np.array(outputs[0])
-        outputs = K.function([self.model_ae.input],
-                             [self.model_ae.layers[0].output])(
-                                 [self.input_valid])
-        # outputs = [K.function([self.model_ae.input], [layer.output])([self.input_valid]) for layer in self.model_ae.layers]
-        outputs_ae_valid = np.array(outputs[0])
-        return outputs_ae, outputs_ae_valid
-
-    def train(self):
-        outputs_ae, outputs_ae_valid = self.train_ae()
-        self.model_lstm.compile(optimizer=optimizers.Adam(learning_rate=0.001),
+    def train(self, input_train, input_valid):
+        self.model.compile(optimizer=optimizers.Adam(learning_rate=0.001),
                                 loss=self.loss,
                                 metrics=['mse', 'mae'])
 
-        training_history = self.model_lstm.fit(
-            outputs_ae,
+        training_history = self.model.fit(
+            input_train,
             self.target_train,
             batch_size=self.batch_size,
             epochs=self.epochs,
             callbacks=self.callbacks,
-            validation_data=(outputs_ae_valid, self.target_valid),
+            validation_data=(input_valid, self.target_valid),
             shuffle=True,
             verbose=2)
 
@@ -134,9 +93,13 @@ class AELSTMSupervisor():
             with open(os.path.join(self.log_dir, config_filename), 'w') as f:
                 yaml.dump(config, f, default_flow_style=False)
 
-    def test(self):
-        self.model_ae.load_weights(self.log_dir + 'best_model.hdf5')
-        self.model_lstm.load_weights(self.log_dir + 'best_model.hdf5')
+    def test(self, model_ae):
+        self.model.build(input_shape=(None, self.seq_len, self.latent_space))
+        self.model.load_weights(self.log_dir + 'best_model.hdf5')
+        self.model.compile(optimizer=optimizers.Adam(learning_rate=0.001), loss=self.loss)
+        layer_output = model_ae.layers[0].output
+        self.intermediate_model = Model(inputs=model_ae.input,
+                                outputs=layer_output)
         for ts in range(1, self.timestep+1):
             self._test(ts)
             self.plot_result(str(ts))
@@ -158,7 +121,6 @@ class AELSTMSupervisor():
         for i in iterator:
             if i + l + h > T - h:
                 # trimm all zero lines
-                # pd = pd[~np.all(pd==0, axis=1)]
                 _pd = _pd[~np.all(_pd == 0, axis=1)]
                 iterator.close()
                 break
@@ -166,12 +128,8 @@ class AELSTMSupervisor():
             input_model[0, :, :] = data_test[i:i + l].copy()
             yhats = np.empty(shape=(h,1))
             for timestep in range(h):
-                layer_output = self.model_ae.layers[0].output
-                intermediate_model = Model(inputs=self.model_ae.input,
-                                        outputs=layer_output)
-                outputs_ae = intermediate_model.predict(input_model)
-                # outputs_ae = self.model_ae.predict(input)
-                yhat = self.model_lstm.predict(outputs_ae)
+                outputs_ae = self.intermediate_model.predict(input_model)
+                yhat = self.model.predict(outputs_ae)
                 yhats[timestep] = yhat
                 input_model[0, 0:-1, :] = input_model[0, 1:, :].copy()
                 input_model[0, -1, -1] = yhat
@@ -200,6 +158,7 @@ class AELSTMSupervisor():
         error_list = error_list + [inference_time]
         mae = utils.mae(ground_truth.flatten(), predicted_data.flatten())
         utils.save_metrics(error_list, self.log_dir, "ae_lstm")
+        self.plot_result(ts)
         return mae
 
     def get_inference_time_per_prediction(self):
@@ -214,21 +173,21 @@ class AELSTMSupervisor():
             average_time = time/number
             print("ae_lstm_", str(i+1), ": ", average_time)
 
-    def plot_result(self, name):
+    def plot_result(self, ts):
         preds = np.load(self.log_dir + 'pd.npy')
         gt = np.load(self.log_dir + 'gt.npy')
         if preds.shape[1] == 1 and gt.shape[1] == 1:
-            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values.csv",
+            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values_{}.csv".format(str(ts)),
                                        header=['PM2.5'],
                                        index=False)
-            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv",
+            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv_{}.csv".format(str(ts)),
                                     header=['PM2.5'],
                                     index=False)
         else:
-            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values.csv",
+            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values.csv_{}.csv".format(str(ts)),
                                        header=['PM10', 'PM2.5'],
                                        index=False)
-            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv",
+            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv_{}.csv".format(str(ts)),
                                     header=['PM10', 'PM2.5'],
                                     index=False)
 
@@ -237,5 +196,5 @@ class AELSTMSupervisor():
             plt.plot(gt[:, i], label='gt')
             plt.legend()
             plt.savefig(self.log_dir +
-                        '[result_predict]output_dim_{}_{}.png'.format(str(i + 1), name))
+                        '[result_predict]output_dim_{}_{}.png'.format(str(i + 1), str(ts)))
             plt.close()

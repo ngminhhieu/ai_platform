@@ -163,6 +163,7 @@ class Conv1DLSTMAttentionSupervisor():
         error_list = error_list + [inference_time]
         mae = utils.mae(ground_truth.flatten(), predicted_data.flatten())
         utils.save_metrics(error_list, self.log_dir, "cnn_lstm_attention")
+        self.plot_result(ts)
         return mae
     
     def get_inference_time_per_prediction(self):
@@ -177,21 +178,21 @@ class Conv1DLSTMAttentionSupervisor():
             average_time = time/number
             print("cnn_lstm_attention_", str(i+1), ": ", average_time)
 
-    def plot_result(self, name):
+    def plot_result(self, ts):
         preds = np.load(self.log_dir + 'pd.npy')
         gt = np.load(self.log_dir + 'gt.npy')
         if preds.shape[1] == 1 and gt.shape[1] == 1:
-            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values.csv",
+            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values_{}.csv".format(str(ts)),
                                        header=['PM2.5'],
                                        index=False)
-            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv",
+            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv_{}.csv".format(str(ts)),
                                     header=['PM2.5'],
                                     index=False)
         else:
-            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values.csv",
+            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values.csv_{}.csv".format(str(ts)),
                                        header=['PM10', 'PM2.5'],
                                        index=False)
-            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv",
+            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv_{}.csv".format(str(ts)),
                                     header=['PM10', 'PM2.5'],
                                     index=False)
 
@@ -200,5 +201,5 @@ class Conv1DLSTMAttentionSupervisor():
             plt.plot(gt[:, i], label='gt')
             plt.legend()
             plt.savefig(self.log_dir +
-                        '[result_predict]output_dim_{}_{}.png'.format(str(i + 1), name))
+                        '[result_predict]output_dim_{}_{}.png'.format(str(i + 1), str(ts)))
             plt.close()
