@@ -138,6 +138,7 @@ class AELSTMSupervisor():
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
         for ts in range(1, self.timestep+1):
             self._test(ts)
+            self.plot_result(str(ts))
 
     def _test(self, ts):
         self.model = self.model.load_weights(self.log_dir + 'best_model.hdf5')
@@ -150,7 +151,7 @@ class AELSTMSupervisor():
         pm_data = data_test[:, -self.output_dim:].copy()
         T = len(data_test)
         l = self.seq_len
-        h = self.ts
+        h = ts
         _pd = np.empty(shape=(T, self.output_dim), dtype='float32')
         _pd[:l] = pm_data[:l]
         iterator = tqdm(range(0, T - l - h, h))
@@ -212,7 +213,7 @@ class AELSTMSupervisor():
             average_time = time/number
             print("ae_lstm_", str(i+1), ": ", average_time)
 
-    def plot_result(self):
+    def plot_result(self, name):
         preds = np.load(self.log_dir + 'pd.npy')
         gt = np.load(self.log_dir + 'gt.npy')
         if preds.shape[1] == 1 and gt.shape[1] == 1:
@@ -235,5 +236,5 @@ class AELSTMSupervisor():
             plt.plot(gt[:, i], label='gt')
             plt.legend()
             plt.savefig(self.log_dir +
-                        '[result_predict]output_dim_{}.png'.format(str(i + 1)))
+                        '[result_predict]output_dim_{}_{}.png'.format(str(i + 1), name))
             plt.close()

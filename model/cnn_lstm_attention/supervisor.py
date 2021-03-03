@@ -108,6 +108,7 @@ class Conv1DLSTMAttentionSupervisor():
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
         for ts in range(1, self.timestep+1):
             self._test(ts)
+            self.plot_result(str(ts))
 
     def _test(self, ts):
         scaler = self.data['scaler']
@@ -122,7 +123,7 @@ class Conv1DLSTMAttentionSupervisor():
         h = ts
         _pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
         _pd[:l] = pm_data[:l]
-        iterator = tqdm(range(0, 12, h))
+        iterator = tqdm(range(0, T - l - h, h))
         for i in iterator:
             if i + l + h > T - h:
                 _pd = _pd[~np.all(_pd == 0, axis=1)]
@@ -175,7 +176,7 @@ class Conv1DLSTMAttentionSupervisor():
             average_time = time/number
             print("cnn_lstm_attention_", str(i+1), ": ", average_time)
 
-    def plot_result(self):
+    def plot_result(self, name):
         preds = np.load(self.log_dir + 'pd.npy')
         gt = np.load(self.log_dir + 'gt.npy')
         if preds.shape[1] == 1 and gt.shape[1] == 1:
@@ -198,5 +199,5 @@ class Conv1DLSTMAttentionSupervisor():
             plt.plot(gt[:, i], label='gt')
             plt.legend()
             plt.savefig(self.log_dir +
-                        '[result_predict]output_dim_{}.png'.format(str(i + 1)))
+                        '[result_predict]output_dim_{}_{}.png'.format(str(i + 1), name))
             plt.close()
