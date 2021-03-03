@@ -135,13 +135,13 @@ class AELSTMSupervisor():
                 yaml.dump(config, f, default_flow_style=False)
 
     def test(self):
-        self.model.load_weights(self.log_dir + 'best_model.hdf5')
+        self.model_ae.load_weights(self.log_dir + 'best_model.hdf5')
+        self.model_lstm.load_weights(self.log_dir + 'best_model.hdf5')
         for ts in range(1, self.timestep+1):
             self._test(ts)
             self.plot_result(str(ts))
 
     def _test(self, ts):
-        self.model.load_weights(self.log_dir + 'best_model.hdf5')
         scaler = self.data['scaler']
         start_time = time.time()
         data_test = self.data['test_data_norm'].copy()
