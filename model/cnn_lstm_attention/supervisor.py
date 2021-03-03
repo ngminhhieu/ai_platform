@@ -106,7 +106,7 @@ class Conv1DLSTMAttentionSupervisor():
 
     def test(self):
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
-        for ts in range(2, self.timestep+1):
+        for ts in range(1, self.timestep+1):
             self._test(ts)
             self.plot_result(str(ts))
 
@@ -137,7 +137,8 @@ class Conv1DLSTMAttentionSupervisor():
                 yhat = self.model.predict(input_model)
                 yhats[timestep] = yhat
                 input_model[0, 0:-1, :] = input_model[0, 1:, :].copy()
-                input_model[0, -1, :] = yhat 
+                input_model[0, -1, -1] = yhat
+                input_model[0, -1, :-1] = data_test[i+l, :-1]
 
             _pd[i + l:i + l + h] = yhats.copy()     
 

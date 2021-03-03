@@ -141,7 +141,7 @@ class AELSTMSupervisor():
             self.plot_result(str(ts))
 
     def _test(self, ts):
-        self.model = self.model.load_weights(self.log_dir + 'best_model.hdf5')
+        self.model.load_weights(self.log_dir + 'best_model.hdf5')
         scaler = self.data['scaler']
         start_time = time.time()
         data_test = self.data['test_data_norm'].copy()
@@ -174,7 +174,8 @@ class AELSTMSupervisor():
                 yhat = self.model_lstm.predict(outputs_ae)
                 yhats[timestep] = yhat
                 input_model[0, 0:-1, :] = input_model[0, 1:, :].copy()
-                input_model[0, -1, :] = yhat 
+                input_model[0, -1, -1] = yhat
+                input_model[0, -1, :-1] = data_test[i+l, :-1]
 
             _pd[i + l:i + l + h] = yhats.copy()
 
