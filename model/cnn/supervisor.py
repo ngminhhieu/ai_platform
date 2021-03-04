@@ -1,14 +1,14 @@
-from tensorflow.keras.layers import Conv2D, BatchNormalization, MaxPooling2D, UpSampling2D
-from tensorflow.keras.models import Sequential
+from keras.layers import Conv2D, BatchNormalization, MaxPooling2D, UpSampling2D
+from keras.models import Sequential
 import numpy as np
 from library import common_util
 import model.cnn.utils as utils_conv2d
 import os
 import yaml
 from pandas import read_csv
-from tensorflow.keras.utils import plot_model
-from tensorflow.keras import backend as K
-from tensorflow.keras.losses import mse
+from keras.utils import plot_model
+from keras import backend as K
+from keras.losses import mse
 
 
 class Conv2DSupervisor():

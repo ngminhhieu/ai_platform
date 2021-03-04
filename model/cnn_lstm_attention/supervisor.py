@@ -1,5 +1,5 @@
-from tensorflow.keras.layers import Dense, LSTM, Input, Conv1D
-from tensorflow.keras.models import Sequential, Model
+from keras.layers import Dense, LSTM, Input, Conv1D
+from keras.models import Sequential, Model
 from model.cnn_lstm_attention.attention import Attention
 import numpy as np
 from library import common_util
@@ -7,9 +7,9 @@ import model.cnn_lstm_attention.utils as utils
 import os
 import yaml
 from tqdm import tqdm
-from tensorflow.keras.utils import plot_model
-from tensorflow.keras import backend as K
-from tensorflow.keras.losses import mse
+from keras.utils import plot_model
+from keras import backend as K
+from keras.losses import mse
 import pandas as pd
 from datetime import datetime
 import time

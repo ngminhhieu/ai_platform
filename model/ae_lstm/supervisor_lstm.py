@@ -1,15 +1,15 @@
-from tensorflow.keras.layers import Dense, LSTM, Input, Bidirectional
-from tensorflow.keras.models import Sequential, Model
+from keras.layers import Dense, LSTM, Input, Bidirectional
+from keras.models import Sequential, Model
 import numpy as np
 from library import common_util
 import model.ae_lstm.utils as utils
 import os
 import yaml
 from tqdm import tqdm
-from tensorflow.keras.utils import plot_model
-from tensorflow.keras import backend as K
-from tensorflow.keras import optimizers
-from tensorflow.keras.losses import mse
+from keras.utils import plot_model
+from keras import backend as K
+from keras import optimizers
+from keras.losses import mse
 import pandas as pd
 from datetime import datetime
 import time

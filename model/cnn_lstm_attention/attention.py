@@ -1,6 +1,6 @@
   
-from tensorflow.keras.layers import Dense, Lambda, dot, Activation, concatenate
-from tensorflow.keras.layers import Layer
+from keras.layers import Dense, Lambda, dot, Activation, concatenate
+from keras.layers import Layer
 
 
 class Attention(Layer):

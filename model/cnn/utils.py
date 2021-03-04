@@ -1,7 +1,7 @@
 import numpy as np
 from library import common_util
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras import backend as K
+from keras import backend as K
 
 def create_data_prediction(**kwargs):
 
