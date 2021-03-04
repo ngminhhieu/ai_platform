@@ -74,7 +74,7 @@ if __name__ == '__main__':
             model = LSTMSupervisor(**config)
             model.train()
         elif args.model == 'ae_lstm':
-            with open("config/ae_lstm_ga/ae.yaml") as f:
+            with open("config/ae_lstm/ae.yaml") as f:
                 config_ae = yaml.safe_load(f)
             model_ae = AESupervisor(**config_ae)
             input_train_data, valid_train_data = model_ae.train()
@@ -89,7 +89,7 @@ if __name__ == '__main__':
         elif args.model == 'lstm':
             model = LSTMSupervisor(**config)
         elif args.model == 'ae_lstm':
-            with open("config/ae_lstm_ga/ae.yaml") as f:
+            with open("config/ae_lstm/ae.yaml") as f:
                 config_ae = yaml.safe_load(f)
             model_ae = AESupervisor(**config_ae)
             pretrained_model_ae = model_ae.load_weights()
