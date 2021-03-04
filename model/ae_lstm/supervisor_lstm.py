@@ -168,7 +168,7 @@ class AELSTMSupervisor():
         h = self.timestep
         number = int((T-l-h)/h)
         for i in range(h):
-            dataset = pd.read_csv('./log/ae_lstm_ga/default/ae_lstm_metrics.csv'.format(str(i)), header=None).to_numpy()
+            dataset = pd.read_csv('./log/ae_lstm_ga/ae_lstm/default/ae_lstm_metrics.csv'.format(str(i)), header=None).to_numpy()
             time = dataset[-i, -1]
             average_time = time/number
             print("ae_lstm_", str(i+1), ": ", average_time)
