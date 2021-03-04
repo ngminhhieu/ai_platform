@@ -1,14 +1,14 @@
-from keras.layers import Dense, LSTM, Input
-from keras.models import Sequential
+from tensorflow.python.keras.layers import Dense, LSTM, Input
+from tensorflow.python.keras.models import Sequential
 import numpy as np
 from library import common_util
 import model.lstm.utils as utils
 import os
 import yaml
 from pandas import read_csv
-from keras.utils import plot_model
+from tensorflow.python.keras.utils import plot_model
 from keras import backend as K
-from keras.losses import mse
+from tensorflow.python.keras.losses import mse
 
 
 class LSTMSupervisor():

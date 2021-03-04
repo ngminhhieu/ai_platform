@@ -2,7 +2,7 @@ import logging
 import sys
 import os
 import time
-from keras.callbacks import ModelCheckpoint, EarlyStopping, Callback
+from tensorflow.python.keras.callbacks import ModelCheckpoint, EarlyStopping, Callback
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import matplotlib.pyplot as plt
 import numpy as np

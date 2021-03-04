@@ -1,6 +1,6 @@
   
-from keras.layers import Dense, Lambda, dot, Activation, concatenate
-from keras.layers import Layer
+from tensorflow.python.keras.layers import Dense, Lambda, dot, Activation, concatenate
+from tensorflow.python.keras.layers import Layer
 
 
 class Attention(Layer):
@@ -10,7 +10,7 @@ class Attention(Layer):
 
     def __call__(self, hidden_states):
         """
-        Many-to-one attention mechanism for Keras.
+        Many-to-one attention mechanism for tensorflow.python.keras.
         @param hidden_states: 3D tensor with shape (batch_size, time_steps, input_dim).
         @return: 2D tensor with shape (batch_size, 128)
         @author: felixhao28.
