@@ -1,4 +1,4 @@
-base_dir: log/ae_lstm/ae_lstm/
+base_dir: log/ae_lstm/ae/
 data:
   batch_size: 200
   dataset: data/ae_lstm/taiwan.csv
