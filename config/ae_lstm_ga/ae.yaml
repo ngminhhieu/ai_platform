@@ -16,7 +16,7 @@ model:
   timestep: 6
 train:
   dropout: 0.5
-  epochs: 300
-  optimizer: adam
-  patience: 300
+  epochs: 10
+  optimizer: SGD
+  patience: 10
   loss: mse
