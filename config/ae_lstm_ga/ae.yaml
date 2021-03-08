@@ -17,10 +17,6 @@ model:
 train:
   dropout: 0.5
   epochs: 10
-<<<<<<< HEAD
-  optimizer: adam
-=======
   optimizer: SGD
->>>>>>> 6967874e78961304edb58e7f916590ae90c9c99f
   patience: 10
   loss: mse

@@ -120,13 +120,13 @@ class AELSTMSupervisor():
         iterator = tqdm(range(0, T - l - h, h))
         for i in iterator:
             if i + l + h > T - h:
-                # trimm all zero lines
                 _pd = _pd[~np.all(_pd == 0, axis=1)]
                 iterator.close()
                 break
+
+            yhats = np.empty(shape=(h,1))
             input_model = np.zeros(shape=(1, l, self.input_dim))
             input_model[0, :, :] = data_test[i:i + l].copy()
-            yhats = np.empty(shape=(h,1))
             for timestep in range(h):
                 outputs_ae = self.intermediate_model.predict(input_model)
                 yhat = self.model.predict(outputs_ae)
@@ -166,10 +166,10 @@ class AELSTMSupervisor():
         T = len(data_test)
         l = self.seq_len
         h = self.timestep
-        number = int((T-l-h)/h)
-        for i in range(h):
-            dataset = pd.read_csv('./log/ae_lstm_ga/ae_lstm/default/ae_lstm_metrics.csv'.format(str(i)), header=None).to_numpy()
+        for i in range(1, h+1):
+            dataset = pd.read_csv('./log/ae_lstm_ga/ae_lstm/default/ae_lstm_metrics.csv', header=None).to_numpy()
             time = dataset[-i, -1]
+            number = int((T-l-i)/i)
             average_time = time/number
             print("ae_lstm_", str(i+1), ": ", average_time)
 
@@ -180,14 +180,14 @@ class AELSTMSupervisor():
             pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values_{}.csv".format(str(ts)),
                                        header=['PM2.5'],
                                        index=False)
-            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv_{}.csv".format(str(ts)),
+            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values_{}.csv".format(str(ts)),
                                     header=['PM2.5'],
                                     index=False)
         else:
-            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values.csv_{}.csv".format(str(ts)),
+            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values_{}.csv".format(str(ts)),
                                        header=['PM10', 'PM2.5'],
                                        index=False)
-            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv_{}.csv".format(str(ts)),
+            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values_{}.csv".format(str(ts)),
                                     header=['PM10', 'PM2.5'],
                                     index=False)
 

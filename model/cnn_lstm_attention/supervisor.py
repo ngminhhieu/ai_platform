@@ -50,10 +50,7 @@ class Conv1DLSTMAttentionSupervisor():
         model = Sequential()
         model.add(Conv1D(filters=8,
                    kernel_size=3,
-<<<<<<< HEAD
-=======
                    padding='same',
->>>>>>> 6967874e78961304edb58e7f916590ae90c9c99f
                    input_shape=(self.seq_len, self.input_dim)))
         model.add(LSTM(self.rnn_units,
                  return_sequences=True))
@@ -110,7 +107,7 @@ class Conv1DLSTMAttentionSupervisor():
         T = len(data_test)
         l = self.seq_len
         h = ts
-        _pd = np.zeros(shape=(T, self.output_dim), dtype='float32')
+        _pd = np.empty(shape=(T, self.output_dim), dtype='float32')
         _pd[:l] = pm_data[:l]
         iterator = tqdm(range(0, T - l - h, h))
         for i in iterator:
@@ -160,10 +157,10 @@ class Conv1DLSTMAttentionSupervisor():
         T = len(data_test)
         l = self.seq_len
         h = self.timestep
-        number = int((T-l-h)/h)
-        for i in range(h):
-            dataset = pd.read_csv('./log/cnn_lstm_attention_ga/default/cnn_lstm_attention_metrics.csv'.format(str(i)), header=None).to_numpy()
+        for i in range(1, h+1):
+            dataset = pd.read_csv('./log/cnn_lstm_attention_ga/default/cnn_lstm_attention_metrics.csv', header=None).to_numpy()
             time = dataset[-i, -1]
+            number = int((T-l-i)/i)
             average_time = time/number
             print("cnn_lstm_attention_", str(i+1), ": ", average_time)
 
@@ -174,14 +171,14 @@ class Conv1DLSTMAttentionSupervisor():
             pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values_{}.csv".format(str(ts)),
                                        header=['PM2.5'],
                                        index=False)
-            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv_{}.csv".format(str(ts)),
+            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values_{}.csv".format(str(ts)),
                                     header=['PM2.5'],
                                     index=False)
         else:
-            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values.csv_{}.csv".format(str(ts)),
+            pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values_{}.csv".format(str(ts)),
                                        header=['PM10', 'PM2.5'],
                                        index=False)
-            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values.csv_{}.csv".format(str(ts)),
+            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values_{}.csv".format(str(ts)),
                                     header=['PM10', 'PM2.5'],
                                     index=False)
 

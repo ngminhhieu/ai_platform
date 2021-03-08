@@ -9,11 +9,7 @@ log_level: INFO
 model:
   rnn_units: 100
   activation: relu
-<<<<<<< HEAD
   input_dim: 5
-=======
-  input_dim: 14
->>>>>>> 6967874e78961304edb58e7f916590ae90c9c99f
   output_dim: 1
   seq_len: 12
   horizon: 1
@@ -22,9 +18,5 @@ train:
   dropout: 0
   epochs: 300
   optimizer: adam
-<<<<<<< HEAD
   patience: 30
-=======
-  patience: 15
->>>>>>> 6967874e78961304edb58e7f916590ae90c9c99f
   loss: mse

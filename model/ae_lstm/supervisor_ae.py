@@ -104,8 +104,4 @@ class AESupervisor():
     def load_weights(self):
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
         self.model.compile(optimizer=optimizers.Adam(learning_rate=0.001), loss=self.loss)
-<<<<<<< HEAD
         return self.model
-=======
-        return self.model
->>>>>>> 6967874e78961304edb58e7f916590ae90c9c99f
