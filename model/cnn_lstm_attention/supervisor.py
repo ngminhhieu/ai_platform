@@ -60,16 +60,13 @@ class Conv1DLSTMAttentionSupervisor():
         #     Dense(1, activation=self.activation)
         # ])
         model = Sequential()
-        model.add(Conv1D(filters=16,
+        model.add(Conv1D(filters=8,
                    kernel_size=3,
-                   activation=self.activation,
-                   padding='same',
                    input_shape=(self.seq_len, self.input_dim)))
         model.add(LSTM(self.rnn_units,
-                 activation=self.activation,
                  return_sequences=True))
         model.add(Attention(name='attention_weight'))
-        model.add(Dense(1, activation=self.activation))
+        model.add(Dense(1))
 
         plot_model(model=model,
                    to_file=self.log_dir + '/cnn_lstm_attention_model.png',

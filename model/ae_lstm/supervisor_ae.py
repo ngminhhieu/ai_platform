@@ -62,7 +62,7 @@ class AESupervisor():
         return model
 
     def train(self):
-        self.model.compile(optimizer=optimizers.SGD(learning_rate=0.001),
+        self.model.compile(optimizer=optimizers.Adam(learning_rate=0.001),
                               loss=self.loss,
                               metrics=['mse', 'mae'])
 
@@ -104,5 +104,5 @@ class AESupervisor():
     def load_weights(self):
         print(self.model.summary())
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
-        self.model.compile(optimizer=optimizers.SGD(learning_rate=0.001), loss=self.loss)
+        self.model.compile(optimizer=optimizers.Adam(learning_rate=0.001), loss=self.loss)
         return self.model
