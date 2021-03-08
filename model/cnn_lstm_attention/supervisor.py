@@ -47,21 +47,13 @@ class Conv1DLSTMAttentionSupervisor():
         self.timestep = kwargs['model'].get('timestep')
 
     def construct_model(self):
-        # model = Sequential([
-        #     Conv1D(filters=64,
-        #            kernel_size=3,
-        #            activation=self.activation,
-        #            padding='same',
-        #            input_shape=(self.seq_len, self.input_dim)),
-        #     LSTM(self.rnn_units,
-        #          activation=self.activation,
-        #          return_sequences=True),
-        #     Attention(name='attention_weight'),
-        #     Dense(1, activation=self.activation)
-        # ])
         model = Sequential()
         model.add(Conv1D(filters=8,
                    kernel_size=3,
+<<<<<<< HEAD
+=======
+                   padding='same',
+>>>>>>> 6967874e78961304edb58e7f916590ae90c9c99f
                    input_shape=(self.seq_len, self.input_dim)))
         model.add(LSTM(self.rnn_units,
                  return_sequences=True))

@@ -1,26 +1,23 @@
-base_dir: log/ae_lstm_ga/ae/
+base_dir: log/ae_lstm/ae/
 data:
   batch_size: 200
-  dataset: data/ae_lstm/hanoi.csv
+  dataset: data/ae_lstm/taiwan.csv
   test_batch_size: 1
   test_size: 0.2
   valid_size: 0.2
 log_level: INFO
 model:
-  rnn_units: 50
   activation: relu
-  input_dim: 5
-  output_dim: 1
-  seq_len: 48
   horizon: 1
+  input_dim: 6
+  output_dim: 1
+  rnn_units: 50
+  seq_len: 48
   timestep: 6
 train:
   dropout: 0.5
   epochs: 10
-<<<<<<< HEAD
-  optimizer: adam
-=======
-  optimizer: SGD
->>>>>>> 6967874e78961304edb58e7f916590ae90c9c99f
-  patience: 10
+  log_dir: log/ae_lstm/ae/default/
   loss: mse
+  optimizer: SGD
+  patience: 10
