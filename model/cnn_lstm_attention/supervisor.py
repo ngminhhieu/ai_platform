@@ -171,14 +171,14 @@ class Conv1DLSTMAttentionSupervisor():
             pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values_{}.csv".format(str(ts)),
                                        header=['PM2.5'],
                                        index=False)
-            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values_{}.csv".format(str(ts)),
+            pd.DataFrame(gt).to_csv(self.log_dir + "groundtruth_values_{}.csv".format(str(ts)),
                                     header=['PM2.5'],
                                     index=False)
         else:
             pd.DataFrame(preds).to_csv(self.log_dir + "prediction_values_{}.csv".format(str(ts)),
                                        header=['PM10', 'PM2.5'],
                                        index=False)
-            pd.DataFrame(gt).to_csv(self.log_dir + "grouthtruth_values_{}.csv".format(str(ts)),
+            pd.DataFrame(gt).to_csv(self.log_dir + "groundtruth_values_{}.csv".format(str(ts)),
                                     header=['PM10', 'PM2.5'],
                                     index=False)
 
