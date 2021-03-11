@@ -53,8 +53,10 @@ class Conv1DLSTMAttentionSupervisor():
                    padding='same',
                 #    activation='tanh',
                    input_shape=(self.seq_len, self.input_dim)))
-        model.add(LSTM(self.rnn_units,
-                 return_sequences=True))
+        model.add(LSTM(self.rnn_units, return_sequences=True))
+        model.add(LSTM(self.rnn_units, return_sequences=True))
+        model.add(LSTM(self.rnn_units, return_sequences=True))
+        model.add(LSTM(self.rnn_units, return_sequences=True))
         model.add(Attention(name='attention_weight'))
         model.add(Dense(1))
 
