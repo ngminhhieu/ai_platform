@@ -51,6 +51,7 @@ class Conv1DLSTMAttentionSupervisor():
         model.add(Conv1D(filters=8,
                    kernel_size=3,
                    padding='same',
+                #    activation='tanh',
                    input_shape=(self.seq_len, self.input_dim)))
         model.add(LSTM(self.rnn_units,
                  return_sequences=True))
