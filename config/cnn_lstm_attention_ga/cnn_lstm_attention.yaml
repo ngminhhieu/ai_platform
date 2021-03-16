@@ -7,11 +7,11 @@ data:
   valid_size: 0.2
 log_level: INFO
 model:
-  rnn_units: 800
+  rnn_units: 100
   activation: relu
-  input_dim: 14
+  input_dim: 5
   output_dim: 1
-  seq_len: 12
+  seq_len: 48
   horizon: 1
   timestep: 6
 train:

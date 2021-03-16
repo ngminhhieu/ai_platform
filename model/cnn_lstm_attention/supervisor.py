@@ -50,13 +50,12 @@ class Conv1DLSTMAttentionSupervisor():
         model = Sequential()
         model.add(Conv1D(filters=8,
                    kernel_size=3,
-                   padding='same',
-                #    activation='tanh',
+                   activation='tanh',
                    input_shape=(self.seq_len, self.input_dim)))
-        model.add(LSTM(self.rnn_units, return_sequences=True))
-        model.add(LSTM(self.rnn_units, return_sequences=True))
-        model.add(LSTM(self.rnn_units, return_sequences=True))
-        model.add(LSTM(self.rnn_units, return_sequences=True))
+        model.add(LSTM(self.rnn_units, activation='relu', return_sequences=True))
+        model.add(LSTM(self.rnn_units, activation='relu', return_sequences=True))
+        model.add(LSTM(self.rnn_units, activation='relu', return_sequences=True))
+        model.add(LSTM(self.rnn_units, activation='relu', return_sequences=True))
         model.add(Attention(name='attention_weight'))
         model.add(Dense(1))
 
@@ -95,7 +94,7 @@ class Conv1DLSTMAttentionSupervisor():
 
     def test(self):
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
-        for ts in range(1, self.timestep+1):
+        for ts in range(6, self.timestep+1):
             self._test(ts)
             self.plot_result(str(ts))
 

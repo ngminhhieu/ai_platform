@@ -98,7 +98,7 @@ if __name__ == '__main__':
             model.get_inference_time_per_prediction()
         elif args.model == 'cnn_lstm_attention':
             model = Conv1DLSTMAttentionSupervisor(**config)
-            model.test()
+            #model.test()
             model.get_inference_time_per_prediction()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")

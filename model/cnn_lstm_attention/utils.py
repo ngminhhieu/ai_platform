@@ -39,9 +39,9 @@ def load_dataset(**kwargs):
     # dataset of taiwan
     # dataset = read_csv(dataset_path, usecols=['AMB_TEMP', 'RH', 'WIND_DIREC', 'WIND_SPEED', 'PM10', 'PM2.5'])
     # features selected by GA
-    # dataset = read_csv(dataset_path, usecols=['WIND_SPEED', 'TEMP', 'RADIATION', 'PM10', 'PM2.5'])
+    dataset = read_csv(dataset_path, usecols=['WIND_SPEED', 'TEMP', 'RADIATION', 'PM10', 'PM2.5'])
     # all features Hanoi
-    dataset = read_csv(dataset_path, usecols=['MONTH','DAY','YEAR','HOUR','WIND_SPEED','WIND_DIR','TEMP','RH','BAROMETER','RADIATION','INNER_TEMP','PM10','PM1','PM2.5'])
+    # dataset = read_csv(dataset_path, usecols=['MONTH','DAY','YEAR','HOUR','WIND_SPEED','WIND_DIR','TEMP','RH','BAROMETER','RADIATION','INNER_TEMP','PM10','PM1','PM2.5'])
     train_data2d, valid_data2d, test_data2d = common_util.prepare_train_valid_test(
         data=dataset, test_size=test_size, valid_size=valid_size)
 
