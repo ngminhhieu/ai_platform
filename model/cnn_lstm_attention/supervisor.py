@@ -94,7 +94,7 @@ class Conv1DLSTMAttentionSupervisor():
 
     def test(self):
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
-        for ts in range(6, self.timestep+1):
+        for ts in range(1, self.timestep+1):
             self._test(ts)
             self.plot_result(str(ts))
 
